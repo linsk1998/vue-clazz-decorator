@@ -1,7 +1,8 @@
 import { getClassMetadataValues } from "@/metadata/getClassMetadataValues";
 import { getFieldMetadataValues } from "@/metadata/getFieldMetadataValues";
+import { hydrate } from "@/model/hydrate";
+import { createComputedAccessor, createStateAccessor } from "@/model/reactive";
 import {
-	computed as $computed,
 	inject as $inject,
 	provide as $provide,
 	ComponentInternalInstance, getCurrentInstance,
@@ -12,8 +13,7 @@ import {
 	onErrorCaptured,
 	onMounted,
 	onUnmounted,
-	onUpdated,
-	shallowRef
+	onUpdated
 } from "vue";
 import { Accessor, ACCESSOR_MAP } from "./ACCESSOR_MAP";
 import { DEFAULT_MAP } from "./DEFAULT_MAP";
@@ -90,11 +90,12 @@ export function use<T>(Class: { new(props: Record<string, any>): T; }): T {
 			if(provide) $provide(fieldConfig.provide || key, accessors[key]);
 			continue;
 		}
+		let Class = fieldConfig.type;
 		let state = 'state' in fieldConfig;
 		let prop = 'prop' in fieldConfig;
 		let inject = 'inject' in fieldConfig;
 		if(state) {
-			accessors[key] = createStateAccessor();
+			accessors[key] = createStateAccessor(Class, hydrate);
 			if(provide) $provide(fieldConfig.provide || key, accessors[key]);
 			if(prop) {
 				let value = vueInst.props[fieldConfig.prop || key];
@@ -188,20 +189,6 @@ function createEmitMethod(inst: any, vueInst: ComponentInternalInstance, key: st
 		if(callback) return callback.apply(inst, arguments);
 	};
 }
-function createComputedAccessor(inst: any, key: string, { get, set }: PropertyDescriptor) {
-	const computed = $computed({
-		get: () => get.call(inst),
-		set: (v) => set.call(inst, v)
-	});
-	return {
-		get() {
-			return computed.value;
-		},
-		set(v: any) {
-			computed.value = v;
-		}
-	};
-}
 function createRefAccessor(vueInst: ComponentInternalInstance, key: string) {
 	return {
 		get() {
@@ -227,17 +214,6 @@ function createModelValueAccessor(vueInst: ComponentInternalInstance, key: strin
 				hasCache = false;
 				cache = undefined;
 			});
-		}
-	};
-}
-function createStateAccessor() {
-	const refContainer = shallowRef();
-	return {
-		get() {
-			return refContainer.value;
-		},
-		set(v: any) {
-			refContainer.value = v;
 		}
 	};
 }

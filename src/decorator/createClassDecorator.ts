@@ -1,9 +1,9 @@
-import { getMetadata } from "../getMetadata";
+import { ensureMetadata } from "../ensureMetadata";
 import type { EsClassDecorator, LegacyClassDecorator } from "./types";
 
 
 export function createFieldDecorator<T extends Object>(initClass: (Class: { new(...args: any[]): T; }, metadata: {}) => any): EsClassDecorator<T> & LegacyClassDecorator {
 	return function(Class: any, context?: any) {
-		initClass(Class, context ? context.metadata : getMetadata(Class));
+		initClass(Class, context ? context.metadata : ensureMetadata(Class));
 	};
 }

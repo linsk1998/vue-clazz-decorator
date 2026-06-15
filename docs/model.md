@@ -15,20 +15,30 @@ export class UserBo {
 }
 ```
 
-## normalize 对象规范化
-
-将普通数据（一般是后端传来的JSON）按模型规则转为类型化实例。
-
-```typescript
-var user = normalize({ id: "admin", name: "管理员" }, UserBo);
-```
-
 ## reactive 创建响应式实例
 
 将普通数据按模型规则转为响应式类型化实例。
 
 ```typescript
 var user = reactive({ id: "admin", name: "管理员" }, UserBo);
+```
+
+注：reactive 会无视 @State/@Reactive/@Computed 注解，把所有成员都视为响应式。
+
+## normalize 对象规范化
+
+将普通数据（一般是后端传来的JSON）按模型规则规范化。这是一次性动作，后续赋值不会自动转化。只处理数据格式不包含响应性。
+
+```typescript
+var user = normalize({ id: "admin", name: "管理员" }, UserBo);
+```
+
+## hydrate 对象水合
+
+将后端返回或字面量的“干瘪的”原始数据，转换成“饱满的”具有业务逻辑、状态追踪和关联关系的内存对象。
+
+```typescript
+var user = hydrate({ id: "admin", name: "管理员" }, UserBo);
 ```
 
 ## @JsonProperty 指定 JSON 键名
@@ -44,9 +54,12 @@ export class UserBo {
 
 ## @JsonExpose 控制序列化方向
 
+@JsonExpose(serialize, deserialize)
+@JsonExpose({ serialize, deserialize })
+
 ```typescript
 @JsonExpose()                                // 序列化和反序列化都开启（默认）
-@JsonExpose({ serialize: false })            // 仅反序列化
+@JsonExpose(false)            // 仅反序列化，不生成JSON
 @JsonExpose({ deserialize: false })          // 仅序列化
 ```
 

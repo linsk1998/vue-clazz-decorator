@@ -1,5 +1,5 @@
 import type { EsAccessorDecorator, EsClassDecorator, EsFieldDecorator, EsGetterDecorator, EsMethodDecorator, EsSetterDecorator, LegacyClassDecorator, LegacyMethodDecorator, LegacyPropertyDecorator } from "@/decorator/types";
-import { getMetadata } from "../getMetadata";
+import { ensureMetadata } from "../ensureMetadata";
 import { defineClassMetadata } from "./defineClassMetadata";
 import { defineFieldMetadata } from "./defineFieldMetadata";
 
@@ -9,7 +9,7 @@ export function metadata<This extends object, Value = any>(metadataKey: string, 
 	return function(target: any, context?: any) {
 		if(context) {
 			if(typeof context === "string") {
-				defineFieldMetadata(metadataKey, metadataValue, getMetadata(target.constructor), context);
+				defineFieldMetadata(metadataKey, metadataValue, ensureMetadata(target.constructor), context);
 			} else {
 				switch(context.kind) {
 					case 'class':
@@ -20,7 +20,7 @@ export function metadata<This extends object, Value = any>(metadataKey: string, 
 				}
 			}
 		} else {
-			defineClassMetadata(metadataKey, metadataValue, getMetadata(target));
+			defineClassMetadata(metadataKey, metadataValue, ensureMetadata(target));
 		}
 	};
 }
