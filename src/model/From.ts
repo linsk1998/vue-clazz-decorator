@@ -26,26 +26,23 @@ export function From<This extends object = any, Value = any>(SourceClass: Functi
 		}
 		let Super = SourceClass;
 		do {
-			let fieldMetadata = fieldWeakMap.get(Super[Symbol.metadata]);
-			if(fieldMetadata) {
-				if(sourceField in fieldMetadata) {
-					let data = fieldMetadata[sourceField];
-
-					let names = Object.getOwnPropertyNames(data);
-					let i = names.length;
-					while(i--) {
-						let name = names[i];
-						if(!(name in data)) {
-							data[name] = data[name];
-						}
+			let superFieldMeta = fieldWeakMap.get(Super[Symbol.metadata]);
+			if(superFieldMeta && sourceField in superFieldMeta) {
+				let sourceData = superFieldMeta[sourceField];
+				let names = Object.getOwnPropertyNames(sourceData);
+				let i = names.length;
+				while(i--) {
+					let name = names[i];
+					if(!(name in data)) {
+						data[name] = sourceData[name];
 					}
-					let symbols = Object.getOwnPropertySymbols(data);
-					let j = symbols.length;
-					while(j--) {
-						let symbol = symbols[j];
-						if(!(symbol in data)) {
-							data[symbol] = data[symbol];
-						}
+				}
+				let symbols = Object.getOwnPropertySymbols(sourceData);
+				let j = symbols.length;
+				while(j--) {
+					let symbol = symbols[j];
+					if(!(symbol in data)) {
+						data[symbol] = sourceData[symbol];
 					}
 				}
 			}

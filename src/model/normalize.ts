@@ -1,5 +1,5 @@
 import { fieldWeakMap } from "@/metadata/defineFieldMetadata";
-import { getClassMetadataValues } from "@/metadata/getClassMetadataValues";
+import { getFieldMetadataValues } from "@/metadata/getFieldMetadataValues";
 import { getOwnMetadata } from "@/metadata/getOwnMetadata";
 import { applyOnionDeserialize } from "./deserialize";
 
@@ -38,12 +38,17 @@ function normalize(o: any, Class: any): any {
 		return null;
 	}
 
-	var inst = {};
-	let metadata = getClassMetadataValues(Class);
+	let inst: any = {};
+	let metadata = getFieldMetadataValues(Class);
 	for(let key in o) {
 		if(Object.hasOwn(o, key)) {
 			if(key in metadata) {
-				inst[key] = applyOnionDeserialize(o[key], metadata[key].type);
+				let fieldConfig = metadata[key];
+				let value = applyOnionDeserialize(o[key], fieldConfig);
+				if(fieldConfig.type) {
+					value = normalize(value, fieldConfig.type);
+				}
+				inst[key] = value;
 			} else {
 				inst[key] = o[key];
 			}

@@ -77,7 +77,14 @@ export function ViewModel<T extends Function>(Class: T, context?: ClassDecorator
 				enumerable: true,
 				get() {
 					var accessors = ACCESSOR_MAP.get(this);
-					return accessors?.[key].get();
+					if(accessors) {
+						return accessors[key].get();
+					}
+					var defaults = DEFAULT_MAP.get(this);
+					if(defaults) {
+						return defaults[key];
+					}
+					return undefined;
 				},
 				set(value) {
 					var accessors = ACCESSOR_MAP.get(this);

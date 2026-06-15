@@ -16,7 +16,6 @@ import {
 	onUpdated
 } from "vue";
 import { Accessor, ACCESSOR_MAP } from "./ACCESSOR_MAP";
-import { DEFAULT_MAP } from "./DEFAULT_MAP";
 
 const LIFECYCLE_HOOKS: Record<string, Function> = {
 	onWillMount: onBeforeMount,
@@ -38,11 +37,6 @@ export function use<T>(Class: { new(props: Record<string, any>): T; }): T {
 	getAllMethodNames(constructor.prototype).forEach((method) => {
 		inst[method] = inst[method].bind(inst);
 	});
-	let defaults = DEFAULT_MAP.get(inst);
-	if(!defaults) {
-		defaults = {};
-		DEFAULT_MAP.set(inst, defaults);
-	}
 	let descriptors = Object.getOwnPropertyDescriptors(inst);
 	for(let key in descriptors) {
 		let desc = descriptors[key];
@@ -95,6 +89,7 @@ export function use<T>(Class: { new(props: Record<string, any>): T; }): T {
 		let prop = 'prop' in fieldConfig;
 		let inject = 'inject' in fieldConfig;
 		if(state) {
+			let initValue = inst[key];
 			accessors[key] = createStateAccessor(Class, hydrate);
 			if(provide) $provide(fieldConfig.provide || key, accessors[key]);
 			if(prop) {
@@ -114,11 +109,8 @@ export function use<T>(Class: { new(props: Record<string, any>): T; }): T {
 					}
 				}
 			}
-			if(key in defaults) {
-				let value = defaults[key];
-				if(value !== undefined) {
-					inst[key] = value;
-				}
+			if(initValue !== undefined) {
+				inst[key] = initValue;
 			}
 			continue;
 		}
@@ -126,21 +118,21 @@ export function use<T>(Class: { new(props: Record<string, any>): T; }): T {
 			if(inject) {
 				let accessor: Accessor<any> = $inject(fieldConfig.inject || key);
 				if(accessor) {
-					accessors[key] = createPropInjectAccessor(vueInst, fieldConfig.prop || key, accessor, defaults[key]);
+					accessors[key] = createPropInjectAccessor(vueInst, fieldConfig.prop || key, accessor, inst[key]);
 					if(provide) $provide(fieldConfig.provide || key, accessors[key]);
 					continue;
 				}
 			}
-			accessors[key] = createPropAccessor(vueInst, fieldConfig.prop || key, defaults[key]);
+			accessors[key] = createPropAccessor(vueInst, fieldConfig.prop || key, inst[key]);
 			if(provide) $provide(fieldConfig.provide || key, accessors[key]);
 			continue;
 		}
 		if(inject) {
 			let accessor: Accessor<any> = $inject(fieldConfig.inject || key);
 			if(accessor) {
-				accessors[key] = createInjectAccessor(key, accessor, defaults[key]);
+				accessors[key] = createInjectAccessor(key, accessor, inst[key]);
 			} else {
-				accessors[key] = createReadonlyAccessor(key, defaults[key]);
+				accessors[key] = createReadonlyAccessor(key, inst[key]);
 			}
 			if(provide) $provide(fieldConfig.provide || key, accessors[key]);
 			continue;

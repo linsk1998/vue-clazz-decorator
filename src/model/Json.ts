@@ -32,7 +32,7 @@ function JsonExpose<This extends object = any, Value = any>(options?: any): any 
 export { JsonExpose };
 
 /** 忽略属性，序列化和反序列化时都忽略 */
-export const JsonIgnore: FieldDecorator<any, any> = metadata('expose', { serialize: true, deserialize: true });
+export const JsonIgnore: FieldDecorator<any, any> = metadata('expose', { serialize: false, deserialize: false });
 
 function getOwnMetadata(metadataKey: string | symbol, metadata: any, name: string) {
 	var fieldMetadata = fieldWeakMap.get(metadata);
@@ -67,21 +67,19 @@ export function JsonSerialize<This extends object, Value>(fn: NextHandleFunction
 /** 自定义反序列化逻辑，多个函数采用洋葱模型叠加执行 */
 export function JsonDeserialize<This extends object, Value>(fn: NextHandleFunction): FieldDecorator<This, Value> {
 	return function(target: any, context: any) {
-		return function(target: any, context: any) {
-			var property, metadata;
-			if(typeof context === "string") {
-				property = context;
-				metadata = ensureMetadata(target.constructor);
-			} else {
-				property = context.name;
-				metadata = context.metadata;
-			}
-			var fns: NextHandleFunction[] = getOwnMetadata('deserialize', metadata, property);
-			if(!fns) {
-				fns = [];
-				defineFieldMetadata('deserialize', fns, metadata, property);
-			}
-			fns.push(fn);
-		};
+		var property, metadata;
+		if(typeof context === "string") {
+			property = context;
+			metadata = ensureMetadata(target.constructor);
+		} else {
+			property = context.name;
+			metadata = context.metadata;
+		}
+		var fns: NextHandleFunction[] = getOwnMetadata('deserialize', metadata, property);
+		if(!fns) {
+			fns = [];
+			defineFieldMetadata('deserialize', fns, metadata, property);
+		}
+		fns.push(fn);
 	};
 }

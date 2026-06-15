@@ -1,6 +1,6 @@
 import { enumMember } from "@/enumMenber";
 import { fieldWeakMap } from "@/metadata/defineFieldMetadata";
-import { getClassMetadataValues } from "@/metadata/getClassMetadataValues";
+import { getFieldMetadataValues } from "@/metadata/getFieldMetadataValues";
 import { getOwnMetadata } from "@/metadata/getOwnMetadata";
 import { ACCESSOR_MAP } from "@/vue/ACCESSOR_MAP";
 import { computed, shallowRef } from "vue";
@@ -42,6 +42,7 @@ function reactive(o: any, Class: any): any {
 		// Date等 非自定义的类型
 		return new Class(o);
 	}
+	// 自定义 @Model 类继续往下处理
 	if((o instanceof Class) && o[REACTIVE] && o[INSTANTIATE] === reactive) {
 		return o;
 	}
@@ -57,29 +58,34 @@ function reactive(o: any, Class: any): any {
 	let accessors = {};
 	ACCESSOR_MAP.set(inst, accessors);
 
-	let metadata = getClassMetadataValues(Class);
+	let metadata = getFieldMetadataValues(Class);
 	for(let key in metadata) {
 		let fieldConfig = metadata[key];
-		let computed = 'computed' in fieldConfig;
-		if(computed) {
+		if('computed' in fieldConfig) {
 			accessors[key] = createComputedAccessor(inst, key, fieldConfig.computed);
-			continue;
-		}
-		let Class = fieldConfig.type;
-		if(('state' in fieldConfig) || ('reactive' in fieldConfig)) {
-			let initValue = inst[key];
-			accessors[key] = createStateAccessor(Class, reactive);
-			if(initValue !== undefined) {
-				inst[key] = initValue;
-			}
-			continue;
+		} else {
+			let Type = fieldConfig.type;
+			accessors[key] = createStateAccessor(Type, reactive);
 		}
 	}
 	enumMember(inst, function(prop, descriptor) {
-		if(prop in metadata) return;
+		let fieldConfig = metadata[prop];
+		if(fieldConfig) {
+			if('computed' in fieldConfig) {
+				accessors[prop] = createComputedAccessor(inst, prop, fieldConfig.computed);
+				return;
+			} else if(('state' in fieldConfig) || ('reactive' in fieldConfig)) {
+				let initValue = inst[prop];
+				accessors[prop] = createStateAccessor(Class, reactive);
+				if(initValue !== undefined) {
+					inst[prop] = initValue;
+				}
+				return;
+			}
+		}
 		if('value' in descriptor) {
 			let value = descriptor.value;
-			if(typeof value === 'function' && !Object.hasOwn(inst, prop)) {
+			if(typeof value === 'function') {
 				Object.defineProperty(inst, prop, {
 					configurable: true,
 					enumerable: true,

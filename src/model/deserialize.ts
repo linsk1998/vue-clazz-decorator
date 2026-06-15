@@ -7,7 +7,7 @@ export function applyOnionDeserialize(value: any, fieldConfig: any): any {
 	var fns: NextHandleFunction[] = fieldConfig.deserialize;
 	if(!fns || !fns.length) return value;
 	var i = fns.length - 1;
-	fns[i](value, fieldConfig, createNext(fieldConfig, fns, i - 1));
+	return fns[i](value, fieldConfig, createNext(fieldConfig, fns, i - 1));
 }
 
 function createNext(fieldConfig: any, fns: NextHandleFunction[], index: number): NextFunction {

@@ -5,7 +5,7 @@ export function applyOnionSerialize(value: any, fieldConfig: any): any {
 	var fns: NextHandleFunction[] = fieldConfig.serialize;
 	if(!fns || !fns.length) return value;
 	var i = fns.length - 1;
-	fns[i](value, fieldConfig, createNext(fieldConfig, fns, i - 1));
+	return fns[i](value, fieldConfig, createNext(fieldConfig, fns, i - 1));
 }
 
 function createNext(fieldConfig: any, fns: NextHandleFunction[], index: number): NextFunction {

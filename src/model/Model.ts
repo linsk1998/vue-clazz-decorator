@@ -51,7 +51,14 @@ export function Model<T extends { new(init?: Record<keyof T, any>): T; }>(Class:
 				enumerable: true,
 				get() {
 					var accessors = ACCESSOR_MAP.get(this);
-					return accessors?.[key].get();
+					if(accessors) {
+						return accessors[key].get();
+					}
+					var defaults = DEFAULT_MAP.get(this);
+					if(defaults) {
+						return defaults[key];
+					}
+					return undefined;
 				},
 				set(value) {
 					var accessors = ACCESSOR_MAP.get(this);
@@ -86,8 +93,8 @@ export function Model<T extends { new(init?: Record<keyof T, any>): T; }>(Class:
 				}
 				// 跳过禁止序列化的字段
 				let expose = fieldConfig.expose;
-				if(expose.serializable === false) return;
-				let property = fieldConfig.property;
+				if(expose && expose.serialize === false) return;
+				let property = fieldConfig.property || key;
 				// 应用自定义序列化
 				result[property] = applyOnionSerialize(value, fieldConfig);
 			});

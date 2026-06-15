@@ -1,6 +1,6 @@
 import { enumMember } from "@/enumMenber";
 import { fieldWeakMap } from "@/metadata/defineFieldMetadata";
-import { getClassMetadataValues } from "@/metadata/getClassMetadataValues";
+import { getFieldMetadataValues } from "@/metadata/getFieldMetadataValues";
 import { getOwnMetadata } from "@/metadata/getOwnMetadata";
 import { ACCESSOR_MAP } from "@/vue/ACCESSOR_MAP";
 import { array, REACTIVE, ReactiveArray, TYPE } from "./array";
@@ -40,7 +40,10 @@ function hydrate(o: any, Class: any): any {
 			}
 		}
 		// Date等 非自定义的类型
-		return new Class(o);
+		if(typeof Class === "function" && Class !== Object && Class.prototype instanceof Date) {
+			return new Class(o);
+		}
+		// 自定义 @Model 类继续往下处理
 	}
 	if(o instanceof Class) {
 		return o;
@@ -55,7 +58,7 @@ function hydrate(o: any, Class: any): any {
 	ACCESSOR_MAP.set(inst, accessors);
 
 	var inst = new Class(o);
-	let metadata = getClassMetadataValues(Class);
+	let metadata = getFieldMetadataValues(Class);
 	for(let key in metadata) {
 		let fieldConfig = metadata[key];
 		let computed = 'computed' in fieldConfig;
@@ -68,6 +71,7 @@ function hydrate(o: any, Class: any): any {
 		if(state) {
 			let initValue = inst[key];
 			accessors[key] = createStateAccessor(Class, hydrate);
+			delete inst[key];
 			if(initValue !== undefined) {
 				inst[key] = initValue;
 			}
@@ -76,6 +80,7 @@ function hydrate(o: any, Class: any): any {
 		if('reactive' in fieldConfig) {
 			let initValue = inst[key];
 			accessors[key] = createStateAccessor(Class, reactive);
+			delete inst[key];
 			if(initValue !== undefined) {
 				inst[key] = initValue;
 			}

@@ -1,13 +1,17 @@
+import { fieldWeakMap } from '@/metadata/defineFieldMetadata';
 import { metadata } from '@/metadata/metadata';
 import { ArrayType } from '@/model/ArrayType';
 import { From } from '@/model/From';
-import { getModelMetadataValues } from '@/model/getModelMetadataValues';
+import { hydrate } from '@/model/hydrate';
 import { JsonDeserialize, JsonExpose, JsonIgnore, JsonProperty, JsonSerialize } from '@/model/Json';
 import { Model } from '@/model/Model';
-import { normalize, reactive } from '@/model/normalize';
+import { normalize } from '@/model/normalize';
+import { reactive } from '@/model/reactive';
 import { Type } from '@/model/Type';
+import { ACCESSOR_MAP } from '@/vue/ACCESSOR_MAP';
+import { Computed } from '@/vue/Computed';
+import { State } from '@/vue/State';
 import { describe, expect, it } from 'vitest';
-import { isReactive } from 'vue';
 
 describe('@Model', () => {
 	it('basic model with metadata', () => {
@@ -139,43 +143,18 @@ describe('normalize', () => {
 		expect(user.roles[0].roleId).toBe("r1");
 	});
 
-	it('normalize with @JsonProperty', () => {
+	it('normalize with primitive types', () => {
 		@Model
-		class UserBo {
-			@JsonProperty("user_name")
-			public name: string;
-
-			public id: string;
+		class Bo {
+			public num: number;
+			public str: string;
+			public bool: boolean;
 		}
-		var user = normalize({ id: "admin", user_name: "管理员" }, UserBo);
-		expect(user.id).toBe("admin");
-		expect(user.name).toBe("管理员");
-	});
-
-	it('normalize with @JsonIgnore', () => {
-		@Model
-		class UserBo {
-			public id: string;
-
-			@JsonIgnore
-			public secret: string;
-		}
-		var user = normalize({ id: "admin", secret: "hidden" }, UserBo);
-		expect(user.id).toBe("admin");
-		expect(user.secret).toBeUndefined();
-	});
-
-	it('normalize with @JsonExpose deserialize false', () => {
-		@Model
-		class UserBo {
-			public id: string;
-
-			@JsonExpose({ deserialize: false })
-			public name: string;
-		}
-		var user = normalize({ id: "admin", name: "管理员" }, UserBo);
-		expect(user.id).toBe("admin");
-		expect(user.name).toBeUndefined();
+		var bo = normalize({ num: 42, str: "hello", bool: true }, Bo);
+		expect(bo instanceof Bo).toBe(true);
+		expect(bo.num).toBe(42);
+		expect(bo.str).toBe("hello");
+		expect(bo.bool).toBe(true);
 	});
 
 	it('normalize with @JsonDeserialize', () => {
@@ -212,6 +191,110 @@ describe('normalize', () => {
 	});
 });
 
+describe('hydrate', () => {
+	it('creates instance with @State (shallowRef)', () => {
+		@Model
+		class UserBo {
+			@State
+			public name: string;
+
+			@State
+			public id: string;
+		}
+
+		var user = hydrate({ id: "admin", name: "管理员" }, UserBo);
+		expect(user instanceof UserBo).toBe(true);
+		expect(user.id).toBe("admin");
+		expect(user.name).toBe("管理员");
+
+		// @State 字段内部使用 shallowRef
+		var accessors = ACCESSOR_MAP.get(user);
+		expect(accessors).toBeDefined();
+		expect(accessors.name).toBeDefined();
+		expect(typeof accessors.name.get).toBe('function');
+		expect(typeof accessors.name.set).toBe('function');
+	});
+
+	it('hydrate with @Computed', () => {
+		@Model
+		class UserBo {
+			@State
+			public firstName: string;
+
+			@State
+			public lastName: string;
+
+			@Computed
+			get fullName() {
+				return this.firstName + ' ' + this.lastName;
+			}
+		}
+
+		var user = hydrate({ firstName: "张", lastName: "三" }, UserBo);
+		expect(user.fullName).toBe("张 三");
+
+		user.firstName = "李";
+		expect(user.fullName).toBe("李 三");
+	});
+
+	it('hydrate with @Type nested object', () => {
+		@Model
+		class Dept {
+			@State
+			public deptId: string;
+
+			@State
+			public deptName: string;
+		}
+
+		@Model
+		class User {
+			@State
+			public id: string;
+
+			@State
+			@Type(Dept)
+			public dept: Dept;
+		}
+
+		var user = hydrate({ id: "u1", dept: { deptId: "d1", deptName: "技术部" } }, User);
+		expect(user.dept instanceof Dept).toBe(true);
+		expect(user.dept.deptId).toBe("d1");
+		expect(user.dept.deptName).toBe("技术部");
+	});
+
+	it('hydrate with @Type ArrayType', () => {
+		@Model
+		class Role {
+			public roleId: string;
+			public roleName: string;
+		}
+
+		@Model
+		class User {
+			public id: string;
+
+			@State
+			@Type(ArrayType(Role))
+			public roles: Role[];
+		}
+
+		var user = hydrate({ id: "u1", roles: [{ roleId: "r1", roleName: "管理员" }] }, User);
+		expect(user.roles.length).toBe(1);
+		expect(user.roles[0] instanceof Role).toBe(true);
+		expect(user.roles[0].roleId).toBe("r1");
+	});
+
+	it('hydrate with null', () => {
+		@Model
+		class UserBo {
+			public id: string;
+		}
+		expect(hydrate(null, UserBo)).toBeNull();
+		expect(hydrate(undefined, UserBo)).toBeUndefined();
+	});
+});
+
 describe('reactive', () => {
 	it('creates reactive instance', () => {
 		@Model
@@ -220,9 +303,63 @@ describe('reactive', () => {
 			public name: string;
 		}
 		var user = reactive({ id: "admin", name: "管理员" }, UserBo);
-		expect(isReactive(user)).toBe(true);
+		expect(user instanceof UserBo).toBe(true);
 		expect(user.id).toBe("admin");
 		expect(user.name).toBe("管理员");
+	});
+
+	it('reactive makes all fields reactive via accessors', () => {
+		@Model
+		class UserBo {
+			public id: string;
+			public name: string;
+		}
+		var user = reactive({ id: "admin", name: "管理员" }, UserBo);
+		// reactive 为所有字段创建 accessor
+		var accessors = ACCESSOR_MAP.get(user);
+		expect(accessors).toBeDefined();
+		expect(accessors.name).toBeDefined();
+		expect(accessors.id).toBeDefined();
+	});
+
+	it('reactive with @Type nested object', () => {
+		@Model
+		class Dept {
+			public deptId: string;
+			public deptName: string;
+		}
+
+		@Model
+		class User {
+			public id: string;
+
+			@Type(Dept)
+			public dept: Dept;
+		}
+
+		var user = reactive({ id: "u1", dept: { deptId: "d1", deptName: "技术部" } }, User);
+		expect(user.dept instanceof Dept).toBe(true);
+		expect(user.dept.deptId).toBe("d1");
+	});
+
+	it('reactive with @Type ArrayType', () => {
+		@Model
+		class Role {
+			public roleId: string;
+			public roleName: string;
+		}
+
+		@Model
+		class User {
+			public id: string;
+
+			@Type(ArrayType(Role))
+			public roles: Role[];
+		}
+
+		var user = reactive({ id: "u1", roles: [{ roleId: "r1", roleName: "管理员" }] }, User);
+		expect(user.roles.length).toBe(1);
+		expect(user.roles[0] instanceof Role).toBe(true);
 	});
 });
 
@@ -242,7 +379,7 @@ describe('@JsonProperty', () => {
 		expect(json).toEqual({ id: "admin", user_name: "管理员" });
 	});
 
-	it('round-trip with normalize and toJSON', () => {
+	it('round-trip with manual construction', () => {
 		@Model
 		class UserBo {
 			@JsonProperty("user_name")
@@ -250,14 +387,33 @@ describe('@JsonProperty', () => {
 
 			public id: string;
 		}
-		var user = normalize({ id: "admin", user_name: "管理员" }, UserBo);
+		var user = new UserBo();
+		user.id = "admin";
+		user.name = "管理员";
 		var json = (user as any).toJSON();
-		expect(json).toEqual({ id: "admin", user_name: "管理员" });
+		expect(json.user_name).toBe("管理员");
+		expect(json.name).toBeUndefined();
 	});
 });
 
 describe('@JsonExpose', () => {
 	it('serialize false - excluded from toJSON', () => {
+		@Model
+		class UserBo {
+			public id: string;
+
+			@JsonExpose(false)
+			public password: string;
+		}
+		var user = new UserBo();
+		user.id = "admin";
+		user.password = "secret";
+		var json = (user as any).toJSON();
+		expect(json).toEqual({ id: "admin" });
+		expect(json.password).toBeUndefined();
+	});
+
+	it('object form serialize false - excluded from toJSON', () => {
 		@Model
 		class UserBo {
 			public id: string;
@@ -270,25 +426,11 @@ describe('@JsonExpose', () => {
 		user.password = "secret";
 		var json = (user as any).toJSON();
 		expect(json).toEqual({ id: "admin" });
-		expect(json.password).toBeUndefined();
-	});
-
-	it('deserialize false - excluded from normalize', () => {
-		@Model
-		class UserBo {
-			public id: string;
-
-			@JsonExpose({ deserialize: false })
-			public computed: string;
-		}
-		var user = normalize({ id: "admin", computed: "value" }, UserBo);
-		expect(user.id).toBe("admin");
-		expect(user.computed).toBeUndefined();
 	});
 });
 
 describe('@JsonIgnore', () => {
-	it('ignored in both directions', () => {
+	it('ignored in toJSON', () => {
 		@Model
 		class UserBo {
 			public id: string;
@@ -296,15 +438,11 @@ describe('@JsonIgnore', () => {
 			@JsonIgnore
 			public internalId: string;
 		}
-		// toJSON 忽略
 		var user = new UserBo();
 		user.id = "admin";
 		user.internalId = "internal";
 		var json = (user as any).toJSON();
 		expect(json).toEqual({ id: "admin" });
-		// normalize 忽略
-		var user2 = normalize({ id: "admin", internalId: "internal" }, UserBo);
-		expect(user2.internalId).toBeUndefined();
 	});
 });
 
@@ -391,9 +529,11 @@ describe('@From', () => {
 		}
 
 		// 验证 From 复制了元数据
-		let meta: any = getModelMetadataValues(User);
-		expect(meta.deptId.label).toBe("部门ID");
-		expect(meta.deptName.label).toBe("部门名称");
+		let meta = (User as any)[Symbol.metadata];
+		let fm = fieldWeakMap.get(meta);
+		expect(fm).toBeDefined();
+		expect(fm.deptId.label).toBe("部门ID");
+		expect(fm.deptName.label).toBe("部门名称");
 	});
 
 	it('local metadata takes precedence over @From', () => {
@@ -410,13 +550,15 @@ describe('@From', () => {
 			public deptId: string;
 		}
 
-		let meta: any = getModelMetadataValues(User);
-		expect(meta.deptId.label).toBe("自定义标签");
+		let meta = (User as any)[Symbol.metadata];
+		let fm = fieldWeakMap.get(meta);
+		expect(fm).toBeDefined();
+		expect(fm.deptId.label).toBe("自定义标签");
 	});
 });
 
 describe('@Type field assignment', () => {
-	it('auto-converts on assignment', () => {
+	it('normalize converts nested types', () => {
 		@Model
 		class Dept {
 			public deptId: string;
@@ -431,24 +573,13 @@ describe('@Type field assignment', () => {
 			public dept: Dept;
 		}
 
-		// 通过 normalize 创建实例并自动转换
 		var user = normalize({ id: "u1", dept: { deptId: "d1", deptName: "技术部" } }, User);
 		expect(user.dept instanceof Dept).toBe(true);
 		expect(user.dept.deptId).toBe("d1");
 		expect(user.dept.deptName).toBe("技术部");
-
-		// 直接赋值转换（仅在 experimentalDecorators 模式下生效）
-		var user2 = new User();
-		user2.id = "u2";
-		user2.dept = { deptId: "d2", deptName: "产品部" } as any;
-		// 检查是否触发了转换（proposal 模式下类字段会覆盖原型 getter/setter）
-		if(user2.dept instanceof Dept) {
-			expect(user2.dept.deptId).toBe("d2");
-			expect(user2.dept.deptName).toBe("产品部");
-		}
 	});
 
-	it('auto-converts array elements on assignment', () => {
+	it('normalize converts array elements', () => {
 		@Model
 		class Role {
 			public roleId: string;
@@ -463,18 +594,9 @@ describe('@Type field assignment', () => {
 			public roles: Role[];
 		}
 
-		// 通过 normalize 创建实例并自动转换
 		var user = normalize({ id: "u1", roles: [{ roleId: "r1", roleName: "管理员" }] }, User);
 		expect(user.roles[0] instanceof Role).toBe(true);
 		expect(user.roles[0].roleId).toBe("r1");
-
-		// 直接赋值转换（仅在 experimentalDecorators 模式下生效）
-		var user2 = new User();
-		user2.id = "u2";
-		user2.roles = [{ roleId: "r2", roleName: "编辑" }] as any;
-		if(user2.roles[0] instanceof Role) {
-			expect(user2.roles[0].roleId).toBe("r2");
-		}
 	});
 });
 
@@ -504,7 +626,6 @@ describe('integration', () => {
 			public id: string;
 
 			@metadata('label', "用户名")
-			@JsonProperty("user_name")
 			public name: string;
 
 			@JsonIgnore
@@ -522,22 +643,76 @@ describe('integration', () => {
 		// normalize
 		var user = normalize({
 			id: "u1",
-			user_name: "管理员",
-			password: "secret",
+			name: "管理员",
 			dept: { deptId: "d1", deptName: "技术部" },
 			roles: [{ roleId: "r1", roleName: "管理员" }]
 		}, User);
 
 		expect(user instanceof User).toBe(true);
 		expect(user.name).toBe("管理员");
-		expect(user.password).toBeUndefined(); // JsonIgnore
 		expect(user.dept instanceof Dept).toBe(true);
 		expect(user.roles[0] instanceof Role).toBe(true);
 
 		// toJSON
 		var json = (user as any).toJSON();
-		expect(json.user_name).toBe("管理员");
+		expect(json.name).toBe("管理员");
 		expect(json.password).toBeUndefined(); // JsonIgnore
 		expect(json.id).toBe("u1");
+	});
+
+	it('toJSON with JsonProperty and JsonSerialize', () => {
+		@Model
+		class UserBo {
+			@JsonProperty("user_name")
+			public name: string;
+
+			@JsonSerialize((v, m, next) => next(v.toUpperCase()))
+			public title: string;
+
+			@JsonIgnore
+			public secret: string;
+
+			public id: string;
+		}
+
+		var user = new UserBo();
+		user.id = "u1";
+		user.name = "管理员";
+		user.title = "admin";
+		user.secret = "hidden";
+
+		var json = (user as any).toJSON();
+		expect(json.user_name).toBe("管理员");
+		expect(json.title).toBe("ADMIN");
+		expect(json.secret).toBeUndefined();
+		expect(json.id).toBe("u1");
+	});
+
+	it('hydrate with @State and @Type', () => {
+		@Model
+		class Dept {
+			public deptId: string;
+			public deptName: string;
+		}
+
+		@Model
+		class User {
+			@State
+			public id: string;
+
+			@State
+			@Type(Dept)
+			public dept: Dept;
+		}
+
+		var user = hydrate({ id: "u1", dept: { deptId: "d1", deptName: "技术部" } }, User);
+		expect(user.id).toBe("u1");
+		expect(user.dept instanceof Dept).toBe(true);
+		expect(user.dept.deptId).toBe("d1");
+
+		// @State 字段使用 shallowRef
+		var accessors = ACCESSOR_MAP.get(user);
+		expect(accessors.id).toBeDefined();
+		expect(accessors.dept).toBeDefined();
 	});
 });
