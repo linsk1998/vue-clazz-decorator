@@ -33,7 +33,7 @@ function hydrate(o: any, Class: any): any {
 			return Class(o);
 	}
 	// 判断有没有使用 @Model 装饰器
-	if(getOwnMetadata("model", Class)) {
+	if(!getOwnMetadata("model", Class)) {
 		if(process.env.NODE_ENV !== "production") {
 			if(fieldWeakMap.has(Class)) {
 				console.warn(`found ${Class.name} has no @Model decorator`);
@@ -54,10 +54,10 @@ function hydrate(o: any, Class: any): any {
 		}
 		return null;
 	}
+	let inst = new Class(o);
 	let accessors = {};
 	ACCESSOR_MAP.set(inst, accessors);
 
-	var inst = new Class(o);
 	let metadata = getFieldMetadataValues(Class);
 	for(let key in metadata) {
 		let fieldConfig = metadata[key];
@@ -105,7 +105,7 @@ function hydrate(o: any, Class: any): any {
 	for(let key in o) {
 		if(Object.hasOwn(o, key)) {
 			if(key in metadata) {
-				inst[key] = applyOnionDeserialize(o[key], metadata[key].type);
+				inst[key] = applyOnionDeserialize(o[key], metadata[key]);
 			} else {
 				inst[key] = o[key];
 			}

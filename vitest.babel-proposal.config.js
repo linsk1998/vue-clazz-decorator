@@ -61,10 +61,22 @@ export default defineConfig(function({ command, mode }) {
 				}),
 				enforce: "pre"
 			},
+			{
+				transform(code, id) {
+					"use strict";
+				},
+				enforce: "pre"
+			},
 			vue(),
 			vueJsx({
 				include: /\.(j|t)sx$/
 			}),
+			{
+				transform(code, id) {
+					"use strict";
+				},
+				enforce: "pre"
+			},
 			inject({
 				modules: {
 					"Symbol.metadata": "sky-core/pure/Symbol/metadata"

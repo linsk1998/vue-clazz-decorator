@@ -22,7 +22,7 @@ function normalize(o: any, Class: any): any {
 			return Class(o);
 	}
 	// 判断有没有使用 @Model 装饰器
-	if(getOwnMetadata("model", Class)) {
+	if(!getOwnMetadata("model", Class)) {
 		if(process.env.NODE_ENV !== "production") {
 			if(fieldWeakMap.has(Class)) {
 				console.warn(`found ${Class.name} has no @Model decorator`);

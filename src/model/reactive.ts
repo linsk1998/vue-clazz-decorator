@@ -33,7 +33,7 @@ function reactive(o: any, Class: any): any {
 			return Class(o);
 	}
 	// 判断有没有使用 @Model 装饰器
-	if(getOwnMetadata("model", Class)) {
+	if(!getOwnMetadata("model", Class)) {
 		if(process.env.NODE_ENV !== "production") {
 			if(fieldWeakMap.has(Class)) {
 				console.warn(`found ${Class.name} has no @Model decorator`);
@@ -52,7 +52,7 @@ function reactive(o: any, Class: any): any {
 		}
 		return null;
 	}
-	var inst = new Class(o);
+	let inst = new Class(o);
 	inst[REACTIVE] = true;
 	inst[INSTANTIATE] = reactive;
 	let accessors = {};
@@ -130,7 +130,7 @@ function reactive(o: any, Class: any): any {
 	for(let key in o) {
 		if(Object.hasOwn(o, key)) {
 			if(key in metadata) {
-				inst[key] = applyOnionDeserialize(o[key], metadata[key].type);
+				inst[key] = applyOnionDeserialize(o[key], metadata[key]);
 			} else {
 				inst[key] = o[key];
 			}

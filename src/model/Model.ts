@@ -5,8 +5,12 @@ import { DEFAULT_MAP } from "@/vue/DEFAULT_MAP";
 import { ensureMetadata } from "../ensureMetadata";
 import { applyOnionSerialize } from "./serialize";
 
+interface ClassWithInitializer<T> {
+	new(init?: Record<keyof T, any>): T;
+}
+
 /** 模型层 */
-export function Model<T extends { new(init?: Record<keyof T, any>): T; }>(Class: T, context?: ClassDecoratorContext): T {
+export function Model<T extends object>(Class: ClassWithInitializer<T>, context?: ClassDecoratorContext<ClassWithInitializer<T>>): ClassWithInitializer<T> {
 	if(context) {
 		Class[Symbol.metadata] = context.metadata;
 		defineClassMetadata('model', true, context.metadata);
