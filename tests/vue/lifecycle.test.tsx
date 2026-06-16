@@ -8,7 +8,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { nextTick } from "vue";
 
 describe('lifecycle', () => {
-	describe('experimental', () => {
+	describe('hooks', () => {
 		it('OnWillMount + OnDidMount', async () => {
 			const willMountFn = vi.fn();
 			const didMountFn = vi.fn();

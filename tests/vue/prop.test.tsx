@@ -22,7 +22,7 @@ class PropsViewModel {
 export const PropsComponent = createComponent(MyTemplate, PropsViewModel);
 
 export function ComponentWithProps() {
-	return <PropsComponent name="Prop" fn={function() { }} num={1} />;
+	return <PropsComponent name="Prop" fn={function() {}} num={1} />;
 };
 
 @ViewModel
@@ -50,17 +50,17 @@ function DiffrentPropsComponentDemo() {
 }
 
 describe('prop', () => {
-	it('experimental', () => {
+	it('basic', () => {
 		const wrapper = mount(ComponentWithProps);
 		expect(wrapper.element.textContent).toBe('Hello, Prop!');
 	});
-	it('experimental default value', () => {
+	it('default value', () => {
 		const wrapper = mount(function() {
 			return <DefaultPropComponent />;
 		});
 		expect(wrapper.element.textContent).toBe('Hello, 123!');
 	});
-	it('experimental diffrent prop', () => {
+	it('diffrent prop', () => {
 		const wrapper = mount(DiffrentPropsComponentDemo);
 		expect(wrapper.element.textContent).toBe('Hello, Prop!');
 	});

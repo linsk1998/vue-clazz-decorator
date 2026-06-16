@@ -24,7 +24,7 @@ export class CallBackViewModel {
 export const CallBackCom = createComponent(CallBackView, CallBackViewModel);
 
 describe('event', () => {
-	it('experimental', async () => {
+	it('basic', async () => {
 		// 创建函数监视器
 		const assertCalled = vi.fn();
 

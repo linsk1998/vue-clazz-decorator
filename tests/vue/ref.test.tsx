@@ -7,7 +7,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 
 describe('ref', () => {
-	it('experimental: dom', async () => {
+	it('dom', async () => {
 		function RefView(props: RefViewModel) {
 			return <div>
 				<button ref="button" type="button" onClick={props.onClick}>Caption</button>
@@ -59,7 +59,7 @@ describe('ref', () => {
 		// 清理监视器
 		assertCalled.mockRestore();
 	});
-	it('experimental: component', async () => {
+	it('component', async () => {
 		@ViewModel
 		class CatViewModel {
 			name = "Tom";

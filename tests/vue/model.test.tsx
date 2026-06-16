@@ -7,7 +7,7 @@ import { mount } from '@vue/test-utils';
 import { describe, expect, it, vi } from 'vitest';
 
 describe('v-model', () => {
-	it('experimental: input', async () => {
+	it('input', async () => {
 		function StateView(props: StateViewModel) {
 			return <>
 				<div>{props.text}</div>
@@ -62,7 +62,7 @@ describe('v-model', () => {
 		await buttons[1].trigger('click');
 		expect(assertCalled).toHaveBeenCalled();
 	});
-	it('experimental: component', async () => {
+	it('component', async () => {
 		@ViewModel
 		class InputViewModel {
 			@ModelValue

@@ -6,7 +6,7 @@ import { mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 
 describe('v-model', () => {
-	it('experimental: component', async () => {
+	it('component', async () => {
 		var ret: string;
 		@ViewModel
 		class ButtonViewModel {

@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { useSlots } from "vue";
 
 describe('slot', () => {
-	describe('experimental', () => {
+	describe('basic', () => {
 		it('default', async () => {
 			var Provider = createComponent(function(props) {
 				return <div>{useChildren()}</div>;

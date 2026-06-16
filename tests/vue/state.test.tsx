@@ -8,7 +8,7 @@ import { mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 
 describe('state', () => {
-	it('experimental', async () => {
+	it('basic', async () => {
 		function StateView(props: StateViewModel) {
 			return <>
 				<div>Count: {props.count}</div>
@@ -43,7 +43,7 @@ describe('state', () => {
 		await buttons[0].trigger('click');
 		expect(children[0].textContent).toBe('Count: 0');
 	});
-	it('experimental prop state', async () => {
+	it('prop state', async () => {
 		function StateView(props: StateViewModel) {
 			return <>
 				<div>Count: {props.count}</div>
@@ -82,7 +82,7 @@ describe('state', () => {
 		await buttons[0].trigger('click');
 		expect(children[0].textContent).toBe('Count: 1');
 	});
-	it('experimental @State + @Prop combination', async () => {
+	it('@State + @Prop combination', async () => {
 		function ComboView(props: ComboViewModel) {
 			return <>
 				<div>Name: {props.name}</div>
@@ -115,7 +115,7 @@ describe('state', () => {
 		await button.trigger('click');
 		expect(children[0].textContent).toBe('Name: updated');
 	});
-	it('experimental prop state default value', async () => {
+	it('prop state default value', async () => {
 		function StateView(props: StateViewModel) {
 			return <>
 				<div>Count: {props.count}</div>
@@ -150,7 +150,7 @@ describe('state', () => {
 		await buttons[0].trigger('click');
 		expect(children[0].textContent).toBe('Count: 2');
 	});
-	it('experimental @State + @Inject combination', async () => {
+	it('@State + @Inject combination', async () => {
 		@ViewModel
 		class AncestorViewModel {
 			@Provide('sharedCount')

@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest';
 
 
 describe('computed', () => {
-	it('experimental', async () => {
+	it('basic', async () => {
 		function ComputedView(props: ComputedViewModel) {
 			return <>
 				<div>Double Count: {props.doubleCount}</div>

@@ -21,7 +21,7 @@ function TsxComponent() {
 }
 
 describe('createComponent', () => {
-	it('experimental', () => {
+	it('basic', () => {
 		const wrapper = mount(TsxComponent);
 		const children = wrapper.element.children;
 		expect(children[0].textContent).toBe('Hello, Tsx!');

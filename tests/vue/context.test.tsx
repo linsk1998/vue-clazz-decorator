@@ -11,7 +11,7 @@ import { describe, expect, it } from 'vitest';
 
 
 describe('context', () => {
-	describe('experimental', () => {
+	describe('basic', () => {
 		it('class', async () => {
 			@ViewModel
 			@Provide('ancestor')
