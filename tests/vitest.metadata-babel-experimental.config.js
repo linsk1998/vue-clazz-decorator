@@ -76,6 +76,7 @@ export default defineConfig(function({ command, mode }) {
 				modules: {
 					'Reflect.metadata': ["vue-clazz-decorator", 'metadata'],
 					'Reflect.getMetadata': ["vue-clazz-decorator", 'getMetadata'],
+					'Reflect.getOwnMetadata': ["vue-clazz-decorator", 'getOwnMetadata'],
 					"Symbol.metadata": "sky-core/pure/Symbol/metadata"
 				}
 			})
