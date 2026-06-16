@@ -18,7 +18,7 @@ function getClassMetadata(metadataKey: string | symbol, Class: Object) {
 			return classMetadata[metadataKey];
 		}
 	}
-	var Super = Object.getPrototypeOf(Class);
+	let Super = Object.getPrototypeOf(Class);
 	if(Super && Super !== Function.prototype) {
 		return getClassMetadata(metadataKey, Super);
 	}
@@ -34,7 +34,7 @@ function getFieldMetadata(metadataKey: string | symbol, Class: Object, name: str
 			}
 		}
 	}
-	var Super = Object.getPrototypeOf(Class);
+	let Super = Object.getPrototypeOf(Class);
 	if(Super && Super !== Function.prototype) {
 		return getFieldMetadata(metadataKey, Super, name);
 	}

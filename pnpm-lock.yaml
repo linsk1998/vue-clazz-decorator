@@ -57,6 +57,9 @@ importers:
       babel-plugin-transform-typescript-decorators:
         specifier: ^0.3.0
         version: 0.3.0(@babel/core@7.29.7)(tslib@2.8.1)
+      babel-plugin-transform-typescript-metadata:
+        specifier: ^0.4.0
+        version: 0.4.0(@babel/core@7.29.7)
       jsdom:
         specifier: ^26.0.0
         version: 26.1.0
@@ -833,6 +836,11 @@ packages:
     peerDependencies:
       '@babel/core': ^7.0.0
       tslib: ^2.0.0
+
+  babel-plugin-transform-typescript-metadata@0.4.0:
+    resolution: {integrity: sha512-thy3pV6nMurTsjxONcv14/AyWCLY3RoftFQGJSTrhLOToYSVFCQlm2PD6KHK1UqHPKHwRPXgujfUWhrKuVctcg==}
+    peerDependencies:
+      '@babel/core': ^7.0.0 || ^8.0.0-0
 
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
@@ -2216,6 +2224,11 @@ snapshots:
       '@babel/core': 7.29.7
       '@babel/helper-plugin-utils': 7.29.7
       tslib: 2.8.1
+
+  babel-plugin-transform-typescript-metadata@0.4.0(@babel/core@7.29.7):
+    dependencies:
+      '@babel/core': 7.29.7
+      '@babel/helper-plugin-utils': 7.29.7
 
   balanced-match@1.0.2: {}
 

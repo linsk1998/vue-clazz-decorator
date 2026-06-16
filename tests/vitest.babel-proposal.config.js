@@ -4,7 +4,7 @@ import vue from "@vitejs/plugin-vue";
 import vueJsx from "@vitejs/plugin-vue-jsx";
 import path from "path";
 import { defineConfig } from 'vite';
-import sky from './node_modules/sky-core/createRollupPlugin';
+import sky from '../node_modules/sky-core/createRollupPlugin';
 
 export default defineConfig(function({ command, mode }) {
 	var babelRuntimePath = require.resolve("@babel/runtime/package.json", {
@@ -16,7 +16,7 @@ export default defineConfig(function({ command, mode }) {
 	return {
 		resolve: {
 			alias: {
-				'@': path.resolve(__dirname, "./src")
+				'@': path.resolve(__dirname, "../src")
 			}
 		},
 		define: {
@@ -41,14 +41,13 @@ export default defineConfig(function({ command, mode }) {
 							useESModules: true,
 							version: babelRuntimeVersion
 						}],
-						"babel-plugin-mark-fields",
-						["babel-plugin-transform-typescript-decorators", {
-							experimentalDecorators: true,
-							useDefineForClassFields: false
+						["@babel/plugin-proposal-decorators", {
+							version: "2023-11",
+							decoratorsBeforeExport: true
 						}],
 						["@babel/plugin-transform-typescript", {
 							allowNamespaces: true,
-							allowDeclareFields: false,
+							allowDeclareFields: true,
 							isTSX: true,
 							disallowAmbiguousJSXLike: true,
 							onlyRemoveTypeImports: false,
@@ -88,8 +87,8 @@ export default defineConfig(function({ command, mode }) {
 			transformMode: {
 				web: [/\.[jt]sx?$/],
 			},
-			include: ['tests/**/*.test.{js,ts,jsx,tsx}'],
-			exclude: ['tests/metadata/proposal.test.ts'],
+			include: ['tests/**/*.test.{js,jsx,tsx,tsx}'],
+			exclude: ['tests/metadata/experimental.test.ts', 'tests/type-metadata/**', '**/node_modules/**'],
 		},
 	};
 });

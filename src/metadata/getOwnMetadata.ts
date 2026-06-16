@@ -6,9 +6,9 @@ export function getOwnMetadata(metadataKey: string | symbol, Class: Object, name
 	if(name) {
 		Class = getClass(Class);
 		if(Object.hasOwn(Class, Symbol.metadata)) {
-			var fieldMetadata = fieldWeakMap.get(Class[Symbol.metadata]);
+			let fieldMetadata = fieldWeakMap.get(Class[Symbol.metadata]);
 			if(fieldMetadata) {
-				var data = fieldMetadata[name];
+				let data = fieldMetadata[name];
 				if(data) {
 					return data[metadataKey];
 				}
@@ -16,7 +16,7 @@ export function getOwnMetadata(metadataKey: string | symbol, Class: Object, name
 		}
 	} else {
 		if(Object.hasOwn(Class, Symbol.metadata)) {
-			var classMetadata = classWeakMap.get(Class[Symbol.metadata]);
+			let classMetadata = classWeakMap.get(Class[Symbol.metadata]);
 			if(classMetadata) {
 				return classMetadata[metadataKey];
 			}

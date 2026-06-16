@@ -4,27 +4,31 @@
 	"description": "Write Vue 3 components with Class + Decorators, featuring MVVM pattern, metadata system, and reactive model layer.",
 	"main": "dist/index.cjs",
 	"module": "dist/index.mjs",
-	"types": "dist/types/index.d.ts",
+	"types": "types/index.d.ts",
 	"exports": {
 		".": {
-			"types": "./dist/types/index.d.ts",
+			"types": "./types/index.d.ts",
 			"import": "./dist/index.mjs",
 			"require": "./dist/index.cjs"
 		}
 	},
 	"files": [
-		"dist"
+		"dist",
+		"types"
 	],
 	"keywords": [],
 	"author": "linsk",
 	"license": "MIT",
 	"scripts": {
 		"build": "rollup -c rollup.config.mjs",
-		"test": "npm run test:experimental && npm run test:proposal && npm run test:babel-experimental && npm run test:babel-proposal",
-		"test:experimental": "vitest -c vitest.experimental.config.js --watch=false",
-		"test:proposal": "vitest -c vitest.proposal.config.js --watch=false",
-		"test:babel-experimental": "vitest -c vitest.babel-experimental.config.js --watch=false",
-		"test:babel-proposal": "vitest -c vitest.babel-proposal.config.js --watch=false"
+		"types": "tsc --declaration --declarationDir types",
+		"test": "npm run test:experimental && npm run test:proposal && npm run test:babel-experimental && npm run test:babel-proposal && npm run test:metadata-experimental && npm run test:metadata-babel-experimental",
+		"test:experimental": "vitest -c tests/vitest.experimental.config.js --watch=false",
+		"test:proposal": "vitest -c tests/vitest.proposal.config.js --watch=false",
+		"test:babel-experimental": "vitest -c tests/vitest.babel-experimental.config.js --watch=false",
+		"test:babel-proposal": "vitest -c tests/vitest.babel-proposal.config.js --watch=false",
+		"test:metadata-experimental": "vitest -c tests/vitest.metadata-experimental.config.js --watch=false",
+		"test:metadata-babel-experimental": "vitest -c tests/vitest.metadata-babel-experimental.config.js --watch=false"
 	},
 	"dependencies": {
 		"vue": "^3.5.13"
@@ -45,6 +49,7 @@
 		"@vue/test-utils": "^2.4.6",
 		"babel-plugin-mark-fields": "^1.0.0",
 		"babel-plugin-transform-typescript-decorators": "^0.3.0",
+		"babel-plugin-transform-typescript-metadata": "^0.4.0",
 		"jsdom": "^26.0.0",
 		"rollup": "3.0.0",
 		"sky-core": "^0.24.0",

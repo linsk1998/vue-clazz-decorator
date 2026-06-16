@@ -5,15 +5,15 @@ import { fieldWeakMap } from "./defineFieldMetadata";
 export function getOwnMetadataKeys(Class: Object, name?: string): string[] {
 	if(name) {
 		Class = getClass(Class);
-		var fieldMetadata = fieldWeakMap.get(Class[Symbol.metadata]);
+		let fieldMetadata = fieldWeakMap.get(Class[Symbol.metadata]);
 		if(fieldMetadata) {
-			var data = fieldMetadata[name];
+			let data = fieldMetadata[name];
 			if(data) {
 				return Object.keys(data);
 			}
 		}
 	} else {
-		var classMetadata = classWeakMap.get(Class[Symbol.metadata]);
+		let classMetadata = classWeakMap.get(Class[Symbol.metadata]);
 		if(classMetadata) {
 			return Object.keys(classMetadata);
 		}

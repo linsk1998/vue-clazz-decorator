@@ -4,7 +4,7 @@ import vue from "@vitejs/plugin-vue";
 import vueJsx from "@vitejs/plugin-vue-jsx";
 import path from "path";
 import { defineConfig } from 'vite';
-import sky from './node_modules/sky-core/createRollupPlugin';
+import sky from '../node_modules/sky-core/createRollupPlugin';
 
 export default defineConfig(function({ command, mode }) {
 	var babelRuntimePath = require.resolve("@babel/runtime/package.json", {
@@ -16,11 +16,11 @@ export default defineConfig(function({ command, mode }) {
 	return {
 		resolve: {
 			alias: {
-				'@': path.resolve(__dirname, "./src")
+				'@': path.resolve(__dirname, "../src"),
+				'vue-clazz-decorator': path.resolve(__dirname, '../src/index.ts'),
 			}
 		},
 		define: {
-			// 关闭 Options API 支持（关键）
 			__VUE_OPTIONS_API__: false,
 		},
 		esbuild: false,
@@ -41,13 +41,14 @@ export default defineConfig(function({ command, mode }) {
 							useESModules: true,
 							version: babelRuntimeVersion
 						}],
-						["@babel/plugin-proposal-decorators", {
-							version: "2023-11",
-							decoratorsBeforeExport: true
+						"babel-plugin-transform-typescript-metadata",
+						["babel-plugin-transform-typescript-decorators", {
+							experimentalDecorators: true,
+							useDefineForClassFields: false
 						}],
 						["@babel/plugin-transform-typescript", {
 							allowNamespaces: true,
-							allowDeclareFields: true,
+							allowDeclareFields: false,
 							isTSX: true,
 							disallowAmbiguousJSXLike: true,
 							onlyRemoveTypeImports: false,
@@ -73,6 +74,8 @@ export default defineConfig(function({ command, mode }) {
 			})(),
 			inject({
 				modules: {
+					'Reflect.metadata': ["vue-clazz-decorator", 'metadata'],
+					'Reflect.getMetadata': ["vue-clazz-decorator", 'getMetadata'],
 					"Symbol.metadata": "sky-core/pure/Symbol/metadata"
 				}
 			})
@@ -87,8 +90,8 @@ export default defineConfig(function({ command, mode }) {
 			transformMode: {
 				web: [/\.[jt]sx?$/],
 			},
-			include: ['tests/**/*.test.{js,jsx,tsx,tsx}'],
-			exclude: ['tests/metadata/experimental.test.ts'],
+			include: ['tests/type-metadata/**/*.test.{ts,tsx}'],
+			exclude: ['**/node_modules/**'],
 		},
 	};
 });

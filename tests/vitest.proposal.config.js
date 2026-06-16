@@ -4,14 +4,14 @@ import vue from "@vitejs/plugin-vue";
 import vueJsx from "@vitejs/plugin-vue-jsx";
 import path from "path";
 import { defineConfig } from 'vite';
-import sky from './node_modules/sky-core/createRollupPlugin';
+import sky from '../node_modules/sky-core/createRollupPlugin';
 
 export default defineConfig(function({ command, mode }) {
 
 	return {
 		resolve: {
 			alias: {
-				'@': path.resolve(__dirname, "./src")
+				'@': path.resolve(__dirname, "../src")
 			}
 		},
 		define: {
@@ -24,17 +24,7 @@ export default defineConfig(function({ command, mode }) {
 				...sky('es2015'),
 				enforce: "pre"
 			},
-			typescript({
-				compilerOptions: {
-					experimentalDecorators: true,
-					useDefineForClassFields: false,
-				},
-				transformers: (program) => ({
-					before: [
-						require("typescript-plugin-mark-fields")(program, {})
-					]
-				})
-			}),
+			typescript(),
 			vue(),
 			(function() {
 				let plugin = vueJsx({
@@ -62,7 +52,7 @@ export default defineConfig(function({ command, mode }) {
 				web: [/\.[jt]sx$/],
 			},
 			include: ['tests/**/*.test.{js,jsx,tsx,tsx}'],
-			exclude: ['tests/metadata/proposal.test.js'],
+			exclude: ['tests/metadata/experimental.test.ts', 'tests/type-metadata/**', '**/node_modules/**'],
 		},
 	};
 });
