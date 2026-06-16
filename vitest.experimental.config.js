@@ -31,9 +31,15 @@ export default defineConfig(function({ command, mode }) {
 				}
 			}),
 			vue(),
-			vueJsx({
-				include: /\.(j|t)sx$/
-			}),
+			(function() {
+				let plugin = vueJsx({
+					tsTransform: 'built-in',
+					include: /\.(j|t)sx$/
+				});
+				plugin.transform.order = undefined;
+				plugin.enforce = "pre";
+				return plugin;
+			})(),
 			inject({
 				modules: {
 					"Symbol.metadata": "sky-core/pure/Symbol/metadata"

@@ -41,10 +41,11 @@ export default defineConfig(function({ command, mode }) {
 							useESModules: true,
 							version: babelRuntimeVersion
 						}],
+						"babel-plugin-mark-fields",
 						["babel-plugin-transform-typescript-decorators", {
-							experimentalDecorators: true
+							experimentalDecorators: true,
+							useDefineForClassFields: false
 						}],
-						require("./scripts/babel-plugin-remove-shadowed"),
 						["@babel/plugin-transform-typescript", {
 							allowNamespaces: true,
 							allowDeclareFields: true,
@@ -62,9 +63,15 @@ export default defineConfig(function({ command, mode }) {
 				enforce: "pre"
 			},
 			vue(),
-			vueJsx({
-				include: /\.(j|t)sx$/
-			}),
+			(function() {
+				let plugin = vueJsx({
+					tsTransform: 'built-in',
+					include: /\.(j|t)sx$/
+				});
+				plugin.transform.order = undefined;
+				plugin.enforce = "pre";
+				return plugin;
+			})(),
 			inject({
 				modules: {
 					"Symbol.metadata": "sky-core/pure/Symbol/metadata"
@@ -79,7 +86,7 @@ export default defineConfig(function({ command, mode }) {
 			environment: 'jsdom',
 			globals: true,
 			transformMode: {
-				web: [/\.[jt]sx$/],
+				web: [/\.[jt]sx?$/],
 			},
 			include: ['tests/**/*.test.{js,ts,jsx,tsx}'],
 			exclude: ['tests/metadata/proposal.test.ts'],

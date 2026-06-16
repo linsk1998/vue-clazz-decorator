@@ -56,7 +56,6 @@ function hydrate(o: any, Class: any): any {
 	}
 	let inst = new Class(o);
 	let accessors = {};
-	ACCESSOR_MAP.set(inst, accessors);
 
 	let metadata = getFieldMetadataValues(Class);
 	for(let key in metadata) {
@@ -69,21 +68,13 @@ function hydrate(o: any, Class: any): any {
 		let Class = fieldConfig.type;
 		let state = 'state' in fieldConfig;
 		if(state) {
-			let initValue = inst[key];
-			accessors[key] = createStateAccessor(Class, hydrate);
+			accessors[key] = createStateAccessor(inst[key], Class, hydrate);
 			delete inst[key];
-			if(initValue !== undefined) {
-				inst[key] = initValue;
-			}
 			continue;
 		}
 		if('reactive' in fieldConfig) {
-			let initValue = inst[key];
-			accessors[key] = createStateAccessor(Class, reactive);
+			accessors[key] = createStateAccessor(inst[key], Class, reactive);
 			delete inst[key];
-			if(initValue !== undefined) {
-				inst[key] = initValue;
-			}
 			continue;
 		}
 
@@ -102,6 +93,7 @@ function hydrate(o: any, Class: any): any {
 			}
 		}
 	});
+	ACCESSOR_MAP.set(inst, accessors);
 	for(let key in o) {
 		if(Object.hasOwn(o, key)) {
 			if(key in metadata) {

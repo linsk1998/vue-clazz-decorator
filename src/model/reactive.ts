@@ -56,18 +56,8 @@ function reactive(o: any, Class: any): any {
 	inst[REACTIVE] = true;
 	inst[INSTANTIATE] = reactive;
 	let accessors = {};
-	ACCESSOR_MAP.set(inst, accessors);
 
 	let metadata = getFieldMetadataValues(Class);
-	for(let key in metadata) {
-		let fieldConfig = metadata[key];
-		if('computed' in fieldConfig) {
-			accessors[key] = createComputedAccessor(inst, key, fieldConfig.computed);
-		} else {
-			let Type = fieldConfig.type;
-			accessors[key] = createStateAccessor(Type, reactive);
-		}
-	}
 	enumMember(inst, function(prop, descriptor) {
 		let fieldConfig = metadata[prop];
 		if(fieldConfig) {
@@ -75,17 +65,14 @@ function reactive(o: any, Class: any): any {
 				accessors[prop] = createComputedAccessor(inst, prop, fieldConfig.computed);
 				return;
 			} else if(('state' in fieldConfig) || ('reactive' in fieldConfig)) {
-				let initValue = inst[prop];
-				accessors[prop] = createStateAccessor(Class, reactive);
-				if(initValue !== undefined) {
-					inst[prop] = initValue;
-				}
+				accessors[prop] = createStateAccessor(inst[prop], fieldConfig.type, reactive);
+				delete inst[prop];
 				return;
 			}
 		}
 		if('value' in descriptor) {
 			let value = descriptor.value;
-			if(typeof value === 'function') {
+			if(typeof value === 'function' && !Object.hasOwn(inst, prop)) {
 				Object.defineProperty(inst, prop, {
 					configurable: true,
 					enumerable: true,
@@ -106,10 +93,7 @@ function reactive(o: any, Class: any): any {
 						accessors[prop].set(value);
 					}
 				});
-				accessors[prop] = createStateAccessor(Class, reactive);
-				if(initValue !== undefined) {
-					inst[prop] = initValue;
-				}
+				accessors[prop] = fieldConfig ? createStateAccessor(initValue, fieldConfig.type, reactive) : createStateAccessor(initValue);
 			}
 		} else {
 			Object.defineProperty(inst, prop, {
@@ -127,6 +111,7 @@ function reactive(o: any, Class: any): any {
 			accessors[prop] = createComputedAccessor(inst, prop, descriptor);
 		}
 	});
+	ACCESSOR_MAP.set(inst, accessors);
 	for(let key in o) {
 		if(Object.hasOwn(o, key)) {
 			if(key in metadata) {
@@ -141,8 +126,8 @@ function reactive(o: any, Class: any): any {
 export { reactive };
 
 
-export function createStateAccessor(Class?: any, instantiate?: InstantiateFunction) {
-	const refContainer = shallowRef();
+export function createStateAccessor(initValue: any, Class?: any, instantiate?: InstantiateFunction) {
+	const refContainer = shallowRef(initValue);
 	if(Class) {
 		return {
 			get() {

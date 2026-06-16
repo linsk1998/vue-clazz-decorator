@@ -21,7 +21,7 @@ describe('reactive', () => {
 	it('reactive makes all fields reactive via accessors', () => {
 		@Model
 		class UserBo {
-			public id: string = undefined;
+			public id: string;
 			public name: string;
 		}
 		var user = reactive({ id: "admin", name: "管理员" }, UserBo);

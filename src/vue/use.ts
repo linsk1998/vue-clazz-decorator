@@ -49,7 +49,6 @@ export function use<T>(Class: { new(props: Record<string, any>): T; }): T {
 		}
 	}
 	let accessors = {};
-	ACCESSOR_MAP.set(inst, accessors);
 	for(let key in metadata) {
 		let fieldConfig = metadata[key];
 		if('emit' in fieldConfig) {
@@ -90,28 +89,23 @@ export function use<T>(Class: { new(props: Record<string, any>): T; }): T {
 		let inject = 'inject' in fieldConfig;
 		if(state) {
 			let initValue = inst[key];
-			accessors[key] = createStateAccessor(Class, hydrate);
-			if(provide) $provide(fieldConfig.provide || key, accessors[key]);
-			if(prop) {
-				let value = vueInst.props[fieldConfig.prop || key];
-				if(value !== undefined) {
-					inst[key] = value;
-					continue;
-				}
-			}
 			if(inject) {
 				let accessor: Accessor<any> = $inject(fieldConfig.inject || key);
 				if(accessor) {
 					let value = accessor.get();
 					if(value !== undefined) {
-						inst[key] = value;
-						continue;
+						initValue = value;
 					}
 				}
 			}
-			if(initValue !== undefined) {
-				inst[key] = initValue;
+			if(prop) {
+				let value = vueInst.props[fieldConfig.prop || key];
+				if(value !== undefined) {
+					initValue = value;
+				}
 			}
+			accessors[key] = createStateAccessor(initValue, Class, hydrate);
+			if(provide) $provide(fieldConfig.provide || key, accessors[key]);
 			continue;
 		}
 		if(prop) {
@@ -151,6 +145,7 @@ export function use<T>(Class: { new(props: Record<string, any>): T; }): T {
 			}
 		}
 	}
+	ACCESSOR_MAP.set(inst, accessors);
 	return inst;
 }
 

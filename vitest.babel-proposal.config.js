@@ -4,7 +4,6 @@ import vue from "@vitejs/plugin-vue";
 import vueJsx from "@vitejs/plugin-vue-jsx";
 import path from "path";
 import { defineConfig } from 'vite';
-import sky from './node_modules/sky-core/createRollupPlugin';
 
 export default defineConfig(function({ command, mode }) {
 	var babelRuntimePath = require.resolve("@babel/runtime/package.json", {
@@ -61,22 +60,16 @@ export default defineConfig(function({ command, mode }) {
 				}),
 				enforce: "pre"
 			},
-			{
-				transform(code, id) {
-					"use strict";
-				},
-				enforce: "pre"
-			},
 			vue(),
-			vueJsx({
-				include: /\.(j|t)sx$/
-			}),
-			{
-				transform(code, id) {
-					"use strict";
-				},
-				enforce: "pre"
-			},
+			(function() {
+				let plugin = vueJsx({
+					tsTransform: 'built-in',
+					include: /\.(j|t)sx$/
+				});
+				plugin.transform.order = undefined;
+				plugin.enforce = "pre";
+				return plugin;
+			})(),
 			inject({
 				modules: {
 					"Symbol.metadata": "sky-core/pure/Symbol/metadata"
@@ -91,7 +84,7 @@ export default defineConfig(function({ command, mode }) {
 			environment: 'jsdom',
 			globals: true,
 			transformMode: {
-				web: [/\.[jt]sx$/],
+				web: [/\.[jt]sx?$/],
 			},
 			include: ['tests/**/*.test.{js,jsx,tsx,tsx}'],
 			exclude: ['tests/metadata/experimental.test.ts'],
