@@ -24,3 +24,5 @@ export function metadata<This extends object, Value = any>(metadataKey: string, 
 		}
 	};
 }
+
+export const __metadata = metadata;

@@ -100,6 +100,10 @@ export function ViewModel<T extends Function>(Class: T, context?: ClassDecorator
 					}
 				}
 			});
+		} else {
+			if(!(key in prototype)) {
+				prototype[key] = undefined;
+			}
 		}
 	}
 	return Class;

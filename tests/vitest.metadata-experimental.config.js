@@ -30,7 +30,12 @@ export default defineConfig(function({ command, mode }) {
 					emitDecoratorMetadata: true,
 					useDefineForClassFields: false,
 					importHelpers: true,
-				}
+				},
+				transformers: (program) => ({
+					before: [
+						require("typescript-plugin-mark-fields")(program, {})
+					]
+				})
 			}),
 			vue(),
 			(function() {
@@ -49,11 +54,11 @@ export default defineConfig(function({ command, mode }) {
 					'Reflect.getOwnMetadata': ["vue-clazz-decorator", 'getOwnMetadata'],
 					"Symbol.metadata": "sky-core/pure/Symbol/metadata"
 				}
-			})
+			}),
 		],
 		optimizeDeps: {
 			include: [],
-			exclude: ['sky-core', '@babel/runtime']
+			exclude: ['sky-core', '@babel/runtime', 'tslib']
 		},
 		test: {
 			environment: 'jsdom',
@@ -63,6 +68,11 @@ export default defineConfig(function({ command, mode }) {
 			},
 			include: ['tests/type-metadata/**/*.test.{ts,tsx}'],
 			exclude: ['**/node_modules/**'],
+			server: {
+				deps: {
+					inline: ['@babel/runtime', 'tslib']
+				},
+			}
 		},
 	};
 });

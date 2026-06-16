@@ -1,4 +1,5 @@
 import { defineClassMetadata } from "@/metadata/defineClassMetadata";
+import { defineFieldMetadata } from "@/metadata/defineFieldMetadata";
 import { getFieldMetadataValues } from "@/metadata/getFieldMetadataValues";
 import { ACCESSOR_MAP } from "@/vue/ACCESSOR_MAP";
 import { DEFAULT_MAP } from "@/vue/DEFAULT_MAP";
@@ -22,10 +23,12 @@ export function Model<T extends object>(Class: ClassWithInitializer<T>, context?
 	for(let key in metadata) {
 		let fieldConfig = metadata[key];
 		// @Type 字段：赋值时自动转为类型化实例
-		let Class = fieldConfig.type;
-		if(!Class) {
-			Class = fieldConfig['design:type'];
-			if(Class) fieldConfig.type = Class;
+		let Type = fieldConfig.type;
+		if(!Type) {
+			Type = fieldConfig['design:type'];
+			if(Type) {
+				defineFieldMetadata('type', Type, Class[Symbol.metadata], key);
+			}
 		}
 		if('computed' in fieldConfig) {
 			let desc = Object.getOwnPropertyDescriptor(prototype, key);
@@ -49,7 +52,7 @@ export function Model<T extends object>(Class: ClassWithInitializer<T>, context?
 					return accessors[key].set(value);
 				}
 			});
-		} else if('state' in fieldConfig || 'reactive' in fieldConfig || Class) {
+		} else if('state' in fieldConfig || 'reactive' in fieldConfig || Type) {
 			Object.defineProperty(prototype, key, {
 				configurable: true,
 				enumerable: true,
@@ -78,6 +81,10 @@ export function Model<T extends object>(Class: ClassWithInitializer<T>, context?
 					}
 				}
 			});
+		} else {
+			if(!(key in prototype)) {
+				prototype[key] = undefined;
+			}
 		}
 	}
 	// 注入 toJSON 方法

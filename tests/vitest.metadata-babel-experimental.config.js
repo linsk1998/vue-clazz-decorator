@@ -41,6 +41,7 @@ export default defineConfig(function({ command, mode }) {
 							useESModules: true,
 							version: babelRuntimeVersion
 						}],
+						"babel-plugin-mark-fields",
 						"babel-plugin-transform-typescript-metadata",
 						["babel-plugin-transform-typescript-decorators", {
 							experimentalDecorators: true,
