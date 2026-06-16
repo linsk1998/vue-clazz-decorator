@@ -5,6 +5,8 @@ type LifecycleDecorator<This extends object, Value extends ((...args: any[]) => 
 	EsMethodDecorator<This, Value> &
 	LegacyMethodDecorator<This>;
 
+/** ViewModel已经创建了实例 */
+export const OnDidCreate: LifecycleDecorator<any> = metadata('onDidCreate', true);
 /** 组件即将挂载 */
 export const OnWillMount: LifecycleDecorator<any> = metadata('onWillMount', true);
 /** 组件已经挂载 */

@@ -71,7 +71,7 @@ export function ViewModel<T extends Function>(Class: T, context?: ClassDecorator
 					console.warn(`ViewModel: ${key} is a ref, but it has inject`);
 				}
 			}
-		} else if('modelValue' in fieldConfig || 'state' in fieldConfig || 'prop' in fieldConfig || 'inject' in fieldConfig) {
+		} else if('modelValue' in fieldConfig || 'state' in fieldConfig || 'prop' in fieldConfig || 'inject' in fieldConfig || 'reactive' in fieldConfig) {
 			Object.defineProperty(prototype, key, {
 				configurable: true,
 				enumerable: true,

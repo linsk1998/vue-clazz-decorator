@@ -1,7 +1,10 @@
+import { Model } from "@/model/Model";
 import { createComponent } from "@/vue/createComponent";
 import { Inject } from "@/vue/Inject";
+import { OnDidCreate } from "@/vue/lifecycle";
 import { Prop } from "@/vue/Prop";
 import { Provide } from "@/vue/Provide";
+import { Reactive } from "@/vue/Reactive";
 import { State } from "@/vue/State";
 import { ViewModel } from "@/vue/ViewModel";
 import { mount } from '@vue/test-utils';
@@ -186,5 +189,79 @@ describe('state', () => {
 		const button = wrapper.find('button');
 		await button.trigger('click');
 		expect(children[0].textContent).toBe('Count: 11');
+	});
+	it('@Reactive deep reactivity', async () => {
+		function ReactiveView(props: ReactiveViewModel) {
+			return <>
+				<div>Name: {props.user.name}</div>
+				<button type="button" onClick={props.rename}>Rename</button>
+			</>;
+		}
+		@Model
+		class Profile {
+			public name: string;
+			public age: number;
+		}
+		@ViewModel
+		class ReactiveViewModel {
+			@Reactive(Profile)
+			user: Profile;
+
+			@OnDidCreate
+			created() {
+				this.user = { name: "张三", age: 25 } as Profile;
+			}
+
+			rename() {
+				this.user.name = "李四";
+			}
+		}
+		const ReactiveCom = createComponent(ReactiveView, ReactiveViewModel);
+		const wrapper = mount(function() {
+			return <ReactiveCom />;
+		});
+		const children = wrapper.element.children;
+		expect(children[0].textContent).toBe('Name: 张三');
+
+		const button = wrapper.find('button');
+		await button.trigger('click');
+		expect(children[0].textContent).toBe('Name: 李四');
+	});
+	it('@Reactive with nested object type', async () => {
+		@Model
+		class Profile {
+			public name: string;
+			public age: number;
+		}
+		function ReactiveView(props: ReactiveViewModel) {
+			return <>
+				<div>Name: {props.profile.name}, Age: {props.profile.age}</div>
+				<button type="button" onClick={props.birthday}>Birthday</button>
+			</>;
+		}
+		@ViewModel
+		class ReactiveViewModel {
+			@Reactive(Profile)
+			profile: Profile;
+
+			@OnDidCreate
+			created() {
+				this.profile = { name: "王五", age: 30 } as Profile;
+			}
+
+			birthday() {
+				this.profile.age++;
+			}
+		}
+		const ReactiveCom = createComponent(ReactiveView, ReactiveViewModel);
+		const wrapper = mount(function() {
+			return <ReactiveCom />;
+		});
+		const children = wrapper.element.children;
+		expect(children[0].textContent).toBe('Name: 王五, Age: 30');
+
+		const button = wrapper.find('button');
+		await button.trigger('click');
+		expect(children[0].textContent).toBe('Name: 王五, Age: 31');
 	});
 });

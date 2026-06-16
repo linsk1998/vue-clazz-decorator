@@ -3,6 +3,7 @@ import { Model } from '@/model/Model';
 import { reactive } from '@/model/reactive';
 import { Type } from '@/model/Type';
 import { ACCESSOR_MAP } from '@/vue/ACCESSOR_MAP';
+import { Reactive } from '@/vue/Reactive';
 import { describe, expect, it } from 'vitest';
 
 describe('reactive', () => {
@@ -70,5 +71,48 @@ describe('reactive', () => {
 		var user = reactive({ id: "u1", roles: [{ roleId: "r1", roleName: "管理员" }] }, User);
 		expect(user.roles.length).toBe(1);
 		expect(user.roles[0] instanceof Role).toBe(true);
+	});
+
+	it('@Reactive with nested type', () => {
+		@Model
+		class Dept {
+			public deptId: string;
+			public deptName: string;
+		}
+
+		@Model
+		class User {
+			public id: string;
+
+			@Reactive(Dept)
+			public dept: Dept;
+		}
+
+		var user = reactive({ id: "u1", dept: { deptId: "d1", deptName: "技术部" } }, User);
+		expect(user.dept instanceof Dept).toBe(true);
+		expect(user.dept.deptId).toBe("d1");
+		expect(user.dept.deptName).toBe("技术部");
+
+		// @Reactive 字段有 accessor
+		var accessors = ACCESSOR_MAP.get(user);
+		expect(accessors).toBeDefined();
+		expect(accessors.dept).toBeDefined();
+	});
+
+	it('@Reactive without type', () => {
+		@Model
+		class UserBo {
+			public id: string;
+
+			@Reactive
+			public profile: { name: string; age: number; };
+		}
+
+		var user = reactive({ id: "u1", profile: { name: "张三", age: 25 } }, UserBo);
+		expect(user.profile.name).toBe("张三");
+		expect(user.profile.age).toBe(25);
+
+		var accessors = ACCESSOR_MAP.get(user);
+		expect(accessors.profile).toBeDefined();
 	});
 });

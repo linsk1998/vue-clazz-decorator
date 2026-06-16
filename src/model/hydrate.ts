@@ -58,32 +58,30 @@ function hydrate(o: any, Class: any): any {
 	let accessors = {};
 
 	let metadata = getFieldMetadataValues(Class);
-	for(let key in metadata) {
+	enumMember(inst, function(key, descriptor) {
 		let fieldConfig = metadata[key];
-		let computed = 'computed' in fieldConfig;
-		if(computed) {
-			accessors[key] = createComputedAccessor(inst, key, fieldConfig.computed);
-			continue;
-		}
-		let Class = fieldConfig.type;
-		if('state' in fieldConfig || 'reactive' in fieldConfig || Class) {
-			accessors[key] = createStateAccessor(inst[key], Class, hydrate);
-			delete inst[key];
-			continue;
-		}
-
-	}
-	enumMember(inst, function(prop, descriptor) {
-		if(prop in metadata) return;
 		if('value' in descriptor) {
 			let value = descriptor.value;
-			if(typeof value === 'function' && !Object.hasOwn(inst, prop)) {
-				Object.defineProperty(inst, prop, {
+			if(typeof value === 'function' && !Object.hasOwn(inst, key)) {
+				Object.defineProperty(inst, key, {
 					configurable: true,
 					enumerable: true,
 					writable: false,
 					value: value.bind(inst)
 				});
+				return;
+			}
+		}
+		if(fieldConfig) {
+			if('computed' in fieldConfig) {
+				accessors[key] = createComputedAccessor(inst, key, fieldConfig.computed);
+				return;
+			}
+			let Type = fieldConfig.type;
+			if('state' in fieldConfig || 'reactive' in fieldConfig || Type) {
+				accessors[key] = createStateAccessor(inst[key], Type, hydrate);
+				delete inst[key];
+				return;
 			}
 		}
 	});

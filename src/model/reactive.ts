@@ -58,58 +58,62 @@ function reactive(o: any, Class: any): any {
 	let accessors = {};
 
 	let metadata = getFieldMetadataValues(Class);
-	enumMember(inst, function(prop, descriptor) {
-		let fieldConfig = metadata[prop];
-		if(fieldConfig) {
-			let Class = fieldConfig.type;
-			if('computed' in fieldConfig) {
-				accessors[prop] = createComputedAccessor(inst, prop, fieldConfig.computed);
-				return;
-			} else if(('state' in fieldConfig) || ('reactive' in fieldConfig) || Class) {
-				accessors[prop] = createStateAccessor(inst[prop], fieldConfig.type, reactive);
-				delete inst[prop];
-				return;
-			}
-		}
+	enumMember(inst, function(key, descriptor) {
+		let fieldConfig = metadata[key];
 		if('value' in descriptor) {
 			let value = descriptor.value;
-			if(typeof value === 'function' && !Object.hasOwn(inst, prop)) {
-				Object.defineProperty(inst, prop, {
+			if(typeof value === 'function' && !Object.hasOwn(inst, key)) {
+				Object.defineProperty(inst, key, {
 					configurable: true,
 					enumerable: true,
 					writable: false,
 					value: value.bind(inst)
 				});
-			} else {
-				let initValue = inst[prop];
-				Object.defineProperty(inst, prop, {
-					configurable: true,
-					enumerable: true,
-					get() {
-						var accessors = ACCESSOR_MAP.get(this);
-						return accessors[prop].get();
-					},
-					set(value) {
-						var accessors = ACCESSOR_MAP.get(this);
-						accessors[prop].set(value);
-					}
-				});
-				accessors[prop] = fieldConfig ? createStateAccessor(initValue, fieldConfig.type, reactive) : createStateAccessor(initValue);
+				return;
 			}
-		} else {
-			Object.defineProperty(inst, prop, {
+		}
+		if(fieldConfig) {
+			if('computed' in fieldConfig) {
+				accessors[key] = createComputedAccessor(inst, key, fieldConfig.computed);
+				return;
+			}
+			let Type = fieldConfig.type;
+			if(('state' in fieldConfig) || ('reactive' in fieldConfig) || Type) {
+				accessors[key] = createStateAccessor(inst[key], Type, reactive);
+				delete inst[key];
+				return;
+			}
+		}
+		if('value' in descriptor) {
+			let initValue = inst[key];
+			Object.defineProperty(inst, key, {
 				configurable: true,
 				enumerable: true,
 				get() {
 					var accessors = ACCESSOR_MAP.get(this);
-					return accessors[prop].get();
+					return accessors[key].get();
 				},
 				set(value) {
 					var accessors = ACCESSOR_MAP.get(this);
-					return accessors[prop].set(value);
+					accessors[key].set(value);
 				}
 			});
-			accessors[prop] = createComputedAccessor(inst, prop, descriptor);
+			let Type = fieldConfig?.type;
+			accessors[key] = Type ? createStateAccessor(initValue, Type, reactive) : createStateAccessor(initValue);
+		} else {
+			Object.defineProperty(inst, key, {
+				configurable: true,
+				enumerable: true,
+				get() {
+					var accessors = ACCESSOR_MAP.get(this);
+					return accessors[key].get();
+				},
+				set(value) {
+					var accessors = ACCESSOR_MAP.get(this);
+					return accessors[key].set(value);
+				}
+			});
+			accessors[key] = createComputedAccessor(inst, key, descriptor);
 		}
 	});
 	ACCESSOR_MAP.set(inst, accessors);

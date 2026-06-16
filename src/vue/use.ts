@@ -1,7 +1,8 @@
+import { enumMember } from "@/enumMenber";
 import { getClassMetadataValues } from "@/metadata/getClassMetadataValues";
 import { getFieldMetadataValues } from "@/metadata/getFieldMetadataValues";
 import { hydrate } from "@/model/hydrate";
-import { createComputedAccessor, createStateAccessor } from "@/model/reactive";
+import { createComputedAccessor, createStateAccessor, reactive } from "@/model/reactive";
 import {
 	inject as $inject,
 	provide as $provide,
@@ -27,116 +28,138 @@ const LIFECYCLE_HOOKS: Record<string, Function> = {
 	onDidCatch: onErrorCaptured,
 };
 
-export function use<T>(Class: { new(props: Record<string, any>): T; }): T {
+export function use<T extends object>(Class: { new(props?: Record<string, any>): T; }): T {
 	let vueInst = getCurrentInstance();
 	if(!vueInst) throw new Error('use must be called in when component setup');
 
 	let metadata = getFieldMetadataValues(Class);
 	let inst = new Class(vueInst.props);
-	let constructor = inst.constructor;
-	getAllMethodNames(constructor.prototype).forEach((method) => {
-		inst[method] = inst[method].bind(inst);
-	});
-	let descriptors = Object.getOwnPropertyDescriptors(inst);
-	for(let key in descriptors) {
-		let desc = descriptors[key];
-		if('value' in desc) {
-			delete inst[key];
-			let value = desc.value;
-			if(value !== undefined) {
-				inst[key] = value;
-			}
-		}
-	}
 	let accessors = {};
-	for(let key in metadata) {
+	enumMember(inst, function(key, descriptor) {
 		let fieldConfig = metadata[key];
-		if('emit' in fieldConfig) {
-			inst[key] = createEmitMethod(inst, vueInst, fieldConfig.emit || key);
-			if(process.env.NODE_ENV !== 'production') {
-				if('provide' in fieldConfig) console.warn('emit and provide are not allowed at the same time');
-				if('computed' in fieldConfig) console.warn('emit and computed are not allowed at the same time');
-				if('modelValue' in fieldConfig) console.warn('emit and modelValue are not allowed at the same time');
-				if('state' in fieldConfig) console.warn('emit and state are not allowed at the same time');
-				if('ref' in fieldConfig) console.warn('emit and ref are not allowed at the same time');
-				if('prop' in fieldConfig) console.warn('emit and prop are not allowed at the same time');
-				if('inject' in fieldConfig) console.warn('emit and inject are not allowed at the same time');
+		if('value' in descriptor) {
+			let value = descriptor.value;
+			if(typeof value === 'function' && !Object.hasOwn(inst, key)) {
+				let method = value.bind(inst);
+				Object.defineProperty(inst, key, {
+					configurable: true,
+					enumerable: true,
+					writable: false,
+					value: method
+				});
+				if(fieldConfig) {
+					if('provide' in fieldConfig) $provide(fieldConfig.provide || key, createProvideAccessor(key, method));
+				}
+				return;
 			}
-			continue;
 		}
-		let provide = 'provide' in fieldConfig;
-		let computed = 'computed' in fieldConfig;
-		if(computed) {
-			accessors[key] = createComputedAccessor(inst, key, fieldConfig.computed);
-			if(provide) $provide(fieldConfig.provide || key, accessors[key]);
-			continue;
-		}
-		let ref = 'ref' in fieldConfig;
-		if(ref) {
-			accessors[key] = createRefAccessor(vueInst, fieldConfig.ref || key);
-			if(provide) $provide(fieldConfig.provide || key, accessors[key]);
-			continue;
-		}
-		let modelValue = 'modelValue' in fieldConfig;
-		if(modelValue) {
-			accessors[key] = createModelValueAccessor(vueInst, fieldConfig.modelValue || key);
-			if(provide) $provide(fieldConfig.provide || key, accessors[key]);
-			continue;
-		}
-		let Class = fieldConfig.type;
-		let state = 'state' in fieldConfig;
-		let prop = 'prop' in fieldConfig;
-		let inject = 'inject' in fieldConfig;
-		if(state) {
-			let initValue = inst[key];
-			if(inject) {
-				let accessor: Accessor<any> = $inject(fieldConfig.inject || key);
-				if(accessor) {
-					let value = accessor.get();
+		if(fieldConfig) {
+			let provide = 'provide' in fieldConfig;
+			if('emit' in fieldConfig) {
+				let method = createEmitMethod(inst, vueInst, fieldConfig.emit || key);
+				Object.defineProperty(inst, key, {
+					configurable: true,
+					enumerable: true,
+					writable: false,
+					value: method
+				});
+				if(provide) $provide(fieldConfig.provide || key, createProvideAccessor(key, method));
+				if(process.env.NODE_ENV !== 'production') {
+					if('provide' in fieldConfig) console.warn('emit and provide are not allowed at the same time');
+					if('computed' in fieldConfig) console.warn('emit and computed are not allowed at the same time');
+					if('modelValue' in fieldConfig) console.warn('emit and modelValue are not allowed at the same time');
+					if('state' in fieldConfig) console.warn('emit and state are not allowed at the same time');
+					if('ref' in fieldConfig) console.warn('emit and ref are not allowed at the same time');
+					if('prop' in fieldConfig) console.warn('emit and prop are not allowed at the same time');
+					if('inject' in fieldConfig) console.warn('emit and inject are not allowed at the same time');
+				}
+				return;
+			}
+			let computed = 'computed' in fieldConfig;
+			if(computed) {
+				accessors[key] = createComputedAccessor(inst, key, fieldConfig.computed);
+				if(provide) $provide(fieldConfig.provide || key, accessors[key]);
+				return;
+			}
+			let ref = 'ref' in fieldConfig;
+			if(ref) {
+				accessors[key] = createRefAccessor(vueInst, fieldConfig.ref || key);
+				if(provide) $provide(fieldConfig.provide || key, accessors[key]);
+				delete inst[key];
+				return;
+			}
+			let modelValue = 'modelValue' in fieldConfig;
+			if(modelValue) {
+				accessors[key] = createModelValueAccessor(vueInst, fieldConfig.modelValue || key);
+				if(provide) $provide(fieldConfig.provide || key, accessors[key]);
+				delete inst[key];
+				return;
+			}
+			let Type = fieldConfig.type;
+			let state = 'state' in fieldConfig;
+			let prop = 'prop' in fieldConfig;
+			let inject = 'inject' in fieldConfig;
+			if(state) {
+				let initValue = inst[key];
+				if(inject) {
+					let accessor: Accessor<any> = $inject(fieldConfig.inject || key);
+					if(accessor) {
+						let value = accessor.get();
+						if(value !== undefined) {
+							initValue = value;
+						}
+					}
+				}
+				if(prop) {
+					let value = vueInst.props[fieldConfig.prop || key];
 					if(value !== undefined) {
 						initValue = value;
 					}
 				}
+				accessors[key] = createStateAccessor(initValue, Type, hydrate);
+				if(provide) $provide(fieldConfig.provide || key, accessors[key]);
+				delete inst[key];
+				return;
 			}
 			if(prop) {
-				let value = vueInst.props[fieldConfig.prop || key];
-				if(value !== undefined) {
-					initValue = value;
+				if(inject) {
+					let accessor: Accessor<any> = $inject(fieldConfig.inject || key);
+					if(accessor) {
+						accessors[key] = createPropInjectAccessor(vueInst, fieldConfig.prop || key, accessor, inst[key]);
+						if(provide) $provide(fieldConfig.provide || key, accessors[key]);
+						delete inst[key];
+						return;
+					}
 				}
+				accessors[key] = createPropAccessor(vueInst, fieldConfig.prop || key, inst[key]);
+				if(provide) $provide(fieldConfig.provide || key, accessors[key]);
+				delete inst[key];
+				return;
 			}
-			accessors[key] = createStateAccessor(initValue, Class, hydrate);
-			if(provide) $provide(fieldConfig.provide || key, accessors[key]);
-			continue;
-		}
-		if(prop) {
 			if(inject) {
 				let accessor: Accessor<any> = $inject(fieldConfig.inject || key);
 				if(accessor) {
-					accessors[key] = createPropInjectAccessor(vueInst, fieldConfig.prop || key, accessor, inst[key]);
-					if(provide) $provide(fieldConfig.provide || key, accessors[key]);
-					continue;
+					accessors[key] = createInjectAccessor(key, accessor, inst[key]);
+				} else {
+					accessors[key] = createReadonlyAccessor(key, inst[key]);
 				}
+				if(provide) $provide(fieldConfig.provide || key, accessors[key]);
+				delete inst[key];
+				return;
 			}
-			accessors[key] = createPropAccessor(vueInst, fieldConfig.prop || key, inst[key]);
-			if(provide) $provide(fieldConfig.provide || key, accessors[key]);
-			continue;
-		}
-		if(inject) {
-			let accessor: Accessor<any> = $inject(fieldConfig.inject || key);
-			if(accessor) {
-				accessors[key] = createInjectAccessor(key, accessor, inst[key]);
-			} else {
-				accessors[key] = createReadonlyAccessor(key, inst[key]);
+			if('reactive' in fieldConfig) {
+				let initValue = inst[key];
+				accessors[key] = Type ? createStateAccessor(initValue, Type, reactive) : createStateAccessor(initValue);
+				delete inst[key];
 			}
-			if(provide) $provide(fieldConfig.provide || key, accessors[key]);
-			continue;
+			if(provide) $provide(fieldConfig.provide || key, createProvidePropertyAccessor(inst, key));
 		}
-		if(provide) $provide(fieldConfig.provide || key, createProvidePropertyAccessor(inst, key));
-	}
+	});
 	let classMetadata = getClassMetadataValues(Class);
 	if(classMetadata.provide) {
 		$provide(classMetadata.provide, createProvideAccessor(classMetadata.provide, inst));
 	}
+	ACCESSOR_MAP.set(inst, accessors);
 	for(let key in metadata) {
 		let fieldConfig = metadata[key];
 		for(let hookName in LIFECYCLE_HOOKS) {
@@ -145,31 +168,20 @@ export function use<T>(Class: { new(props: Record<string, any>): T; }): T {
 			}
 		}
 	}
-	ACCESSOR_MAP.set(inst, accessors);
+	for(let key in metadata) {
+		let fieldConfig = metadata[key];
+		if('onDidCreate' in fieldConfig) {
+			try {
+				inst[key]();
+			} catch(e) {
+				console.error(e);
+			}
+		}
+	}
+
 	return inst;
 }
 
-function getAllMethodNames(obj: any): Set<string> {
-	let methods = new Set<string>();
-	while(obj && obj !== Object.prototype) { // 避免遍历到Object.prototype'
-		let props = Object.getOwnPropertyNames(obj);
-		let i = props.length;
-		while(i-- > 0) {
-			let prop = props[i];
-			if(prop !== 'constructor') {
-				let desc = Object.getOwnPropertyDescriptor(obj, prop);
-				let value = desc.value;
-				if(value) {
-					if(typeof value === 'function' && prop !== 'constructor') {
-						methods.add(prop);
-					}
-				}
-			}
-		}
-		obj = Object.getPrototypeOf(obj);
-	}
-	return methods;
-}
 function createEmitMethod(inst: any, vueInst: ComponentInternalInstance, key: string) {
 	return function() {
 		var callback = vueInst.attrs[key] as Function;

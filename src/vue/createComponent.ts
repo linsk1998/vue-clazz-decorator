@@ -12,7 +12,7 @@ export type VueJsxComponent<T> = {
 /** 创建组件 */
 function createComponent<T>(template: Template<T>): Template<T>;
 function createComponent<T>(template: Template<T>, Class: ViewModel<T>): VueJsxComponent<T>;
-function createComponent<T>(template: Template<any>, Class?: ViewModel<T>): VueJsxComponent<T> | Template<T> {
+function createComponent<T>(template: Template<any>, Class?: { new(props?: Record<string, any>): object; }): VueJsxComponent<T> | Template<T> {
 	if(!Class) return template;
 	let props = new Set<string>();
 	let emits = new Set<string>();
