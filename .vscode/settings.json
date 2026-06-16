@@ -18,7 +18,7 @@
 	"typescript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
 	"typescript.preferences.preferTypeOnlyAutoImports": true,
 	"files.insertFinalNewline": true,
-	"typescript.tsdk": "./packages/example/node_modules/typescript/lib",
+	"typescript.tsdk": "node_modules/typescript/lib",
 	"cSpell.words": [
 		"pluginutils"
 	]
