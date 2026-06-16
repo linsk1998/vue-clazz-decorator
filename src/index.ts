@@ -1,3 +1,4 @@
+export { nextTick } from "vue";
 export * from "./metadata/defineClassMetadata";
 export * from "./metadata/defineFieldMetadata";
 export * from "./metadata/defineMetadata";
