@@ -61,10 +61,11 @@ function reactive(o: any, Class: any): any {
 	enumMember(inst, function(prop, descriptor) {
 		let fieldConfig = metadata[prop];
 		if(fieldConfig) {
+			let Class = fieldConfig.type;
 			if('computed' in fieldConfig) {
 				accessors[prop] = createComputedAccessor(inst, prop, fieldConfig.computed);
 				return;
-			} else if(('state' in fieldConfig) || ('reactive' in fieldConfig)) {
+			} else if(('state' in fieldConfig) || ('reactive' in fieldConfig) || Class) {
 				accessors[prop] = createStateAccessor(inst[prop], fieldConfig.type, reactive);
 				delete inst[prop];
 				return;

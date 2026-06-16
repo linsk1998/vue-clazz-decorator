@@ -22,10 +22,10 @@ export function Model<T extends object>(Class: ClassWithInitializer<T>, context?
 	for(let key in metadata) {
 		let fieldConfig = metadata[key];
 		// @Type 字段：赋值时自动转为类型化实例
-		let type = fieldConfig.type;
-		if(!type) {
-			type = fieldConfig['design:type'];
-			if(type) fieldConfig.type = type;
+		let Class = fieldConfig.type;
+		if(!Class) {
+			Class = fieldConfig['design:type'];
+			if(Class) fieldConfig.type = Class;
 		}
 		if('computed' in fieldConfig) {
 			let desc = Object.getOwnPropertyDescriptor(prototype, key);
@@ -49,7 +49,7 @@ export function Model<T extends object>(Class: ClassWithInitializer<T>, context?
 					return accessors[key].set(value);
 				}
 			});
-		} else if('state' in fieldConfig || 'reactive' in fieldConfig || type) {
+		} else if('state' in fieldConfig || 'reactive' in fieldConfig || Class) {
 			Object.defineProperty(prototype, key, {
 				configurable: true,
 				enumerable: true,

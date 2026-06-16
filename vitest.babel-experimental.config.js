@@ -48,7 +48,7 @@ export default defineConfig(function({ command, mode }) {
 						}],
 						["@babel/plugin-transform-typescript", {
 							allowNamespaces: true,
-							allowDeclareFields: true,
+							allowDeclareFields: false,
 							isTSX: true,
 							disallowAmbiguousJSXLike: true,
 							onlyRemoveTypeImports: false,

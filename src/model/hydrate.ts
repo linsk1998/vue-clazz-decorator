@@ -5,7 +5,7 @@ import { getOwnMetadata } from "@/metadata/getOwnMetadata";
 import { ACCESSOR_MAP } from "@/vue/ACCESSOR_MAP";
 import { array, REACTIVE, ReactiveArray, TYPE } from "./array";
 import { applyOnionDeserialize } from "./deserialize";
-import { createComputedAccessor, createStateAccessor, reactive } from "./reactive";
+import { createComputedAccessor, createStateAccessor } from "./reactive";
 
 function hydrate<T>(o: T[], Class: ArrayConstructor): T[];
 function hydrate<T>(o: any, Class: { new(): T; }): T;
@@ -66,14 +66,8 @@ function hydrate(o: any, Class: any): any {
 			continue;
 		}
 		let Class = fieldConfig.type;
-		let state = 'state' in fieldConfig;
-		if(state) {
+		if('state' in fieldConfig || 'reactive' in fieldConfig || Class) {
 			accessors[key] = createStateAccessor(inst[key], Class, hydrate);
-			delete inst[key];
-			continue;
-		}
-		if('reactive' in fieldConfig) {
-			accessors[key] = createStateAccessor(inst[key], Class, reactive);
 			delete inst[key];
 			continue;
 		}

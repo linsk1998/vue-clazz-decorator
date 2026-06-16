@@ -69,6 +69,9 @@ importers:
       typescript:
         specifier: ^5.8.3
         version: 5.9.3
+      typescript-plugin-mark-fields:
+        specifier: ^1.0.0
+        version: 1.0.0(typescript@5.9.3)
       vite:
         specifier: ^6.0.11
         version: 6.4.3(@types/node@25.9.2)
@@ -1288,6 +1291,11 @@ packages:
 
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
+
+  typescript-plugin-mark-fields@1.0.0:
+    resolution: {integrity: sha512-7TGr0q09zSnLaqel9t0rvnYM5skNdiJzPCqe1ENO/5AS3anZhhgWG0mt8/glL+oSg4blt1A2RBKYu3IGrwYKSQ==}
+    peerDependencies:
+      typescript: '>=4.4'
 
   typescript@5.9.3:
     resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
@@ -2657,6 +2665,10 @@ snapshots:
       punycode: 2.3.1
 
   tslib@2.8.1: {}
+
+  typescript-plugin-mark-fields@1.0.0(typescript@5.9.3):
+    dependencies:
+      typescript: 5.9.3
 
   typescript@5.9.3: {}
 

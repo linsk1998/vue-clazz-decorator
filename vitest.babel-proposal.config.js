@@ -4,6 +4,7 @@ import vue from "@vitejs/plugin-vue";
 import vueJsx from "@vitejs/plugin-vue-jsx";
 import path from "path";
 import { defineConfig } from 'vite';
+import sky from './node_modules/sky-core/createRollupPlugin';
 
 export default defineConfig(function({ command, mode }) {
 	var babelRuntimePath = require.resolve("@babel/runtime/package.json", {

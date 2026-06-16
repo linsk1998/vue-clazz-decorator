@@ -28,7 +28,12 @@ export default defineConfig(function({ command, mode }) {
 				compilerOptions: {
 					experimentalDecorators: true,
 					useDefineForClassFields: false,
-				}
+				},
+				transformers: (program) => ({
+					before: [
+						require("typescript-plugin-mark-fields")(program, {})
+					]
+				})
 			}),
 			vue(),
 			(function() {
