@@ -1,12 +1,12 @@
-import inject from "@rollup/plugin-inject";
-import typescript from "@rollup/plugin-typescript";
-import vue from "@vitejs/plugin-vue";
-import vueJsx from "@vitejs/plugin-vue-jsx";
-import path from "path";
-import { defineConfig } from 'vite';
-import sky from '../node_modules/sky-core/createRollupPlugin';
+const inject = require("@rollup/plugin-inject");
+const typescript = require("@rollup/plugin-typescript");
+const vue = require("@vitejs/plugin-vue");
+const vueJsx = require("@vitejs/plugin-vue-jsx");
+const path = require("path");
+const { defineConfig } = require('vite');
+const sky = require('../node_modules/sky-core/createRollupPlugin');
 
-export default defineConfig(function({ command, mode }) {
+module.exports = defineConfig(function({ command, mode }) {
 
 	return {
 		resolve: {
@@ -24,9 +24,12 @@ export default defineConfig(function({ command, mode }) {
 				...sky('es2015'),
 				enforce: "pre"
 			},
-			typescript(),
-			vue(),
-			(function() {
+			{
+				...vue(),
+			enforce: "pre"
+		},
+		typescript(),
+		(function() {
 				let plugin = vueJsx({
 					tsTransform: 'built-in',
 					include: /\.(j|t)sx$/

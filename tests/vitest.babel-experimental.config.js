@@ -1,12 +1,12 @@
-import { babel } from "@rollup/plugin-babel";
-import inject from "@rollup/plugin-inject";
-import vue from "@vitejs/plugin-vue";
-import vueJsx from "@vitejs/plugin-vue-jsx";
-import path from "path";
-import { defineConfig } from 'vite';
-import sky from '../node_modules/sky-core/createRollupPlugin';
+const { babel } = require("@rollup/plugin-babel");
+const inject = require("@rollup/plugin-inject");
+const vue = require("@vitejs/plugin-vue");
+const vueJsx = require("@vitejs/plugin-vue-jsx");
+const path = require("path");
+const { defineConfig } = require('vite');
+const sky = require('../node_modules/sky-core/createRollupPlugin');
 
-export default defineConfig(function({ command, mode }) {
+module.exports = defineConfig(function({ command, mode }) {
 	var babelRuntimePath = require.resolve("@babel/runtime/package.json", {
 		paths: [process.cwd()]
 	});
@@ -27,6 +27,36 @@ export default defineConfig(function({ command, mode }) {
 		plugins: [
 			{
 				...sky('es2015'),
+				enforce: "pre"
+			},
+			{
+				...vue({
+					devServer: {
+						config: {
+							oxc: {
+								decorators: {
+									legacy: true,
+									emitMetadata: true
+								},
+								assumptions: {
+									setPublicClassFields: true
+								},
+								typescript: {
+									removeClassFieldsWithoutInitializer: true
+								},
+							},
+							esbuild: {
+								tsconfigRaw: JSON.stringify({
+									compilerOptions: {
+										experimentalDecorators: true,
+										useDefineForClassFields: false,
+										emitDecoratorMetadata: false,
+									}
+								})
+							}
+						}
+					}
+				}),
 				enforce: "pre"
 			},
 			{
@@ -62,7 +92,6 @@ export default defineConfig(function({ command, mode }) {
 				}),
 				enforce: "pre"
 			},
-			vue(),
 			(function() {
 				let plugin = vueJsx({
 					tsTransform: 'built-in',

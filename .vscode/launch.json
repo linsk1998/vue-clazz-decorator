@@ -18,6 +18,42 @@
 			"skipFiles": [
 				"<node_internals>/**"
 			]
+		},
+		{
+			"name": "Vitest: Current File With setPublicClassFields",
+			"type": "node",
+			"request": "launch",
+			"runtimeArgs": [
+				"${workspaceFolder}/node_modules/vitest/vitest.mjs",
+				"${file}",
+				"-c",
+				"tests/vitest.babel-experimental.config.js",
+				"--watch=false",
+				"--test-timeout=0"
+			],
+			"cwd": "${workspaceFolder}",
+			"console": "integratedTerminal",
+			"skipFiles": [
+				"<node_internals>/**"
+			]
+		},
+		{
+			"name": "Vitest: Current File With emitDecoratorMetadata",
+			"type": "node",
+			"request": "launch",
+			"runtimeArgs": [
+				"${workspaceFolder}/node_modules/vitest/vitest.mjs",
+				"${file}",
+				"-c",
+				"tests/vitest.metadata-babel-experimental.config.js",
+				"--watch=false",
+				"--test-timeout=0"
+			],
+			"cwd": "${workspaceFolder}",
+			"console": "integratedTerminal",
+			"skipFiles": [
+				"<node_internals>/**"
+			]
 		}
 	]
 }
