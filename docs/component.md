@@ -198,9 +198,9 @@ class ButtonViewModel {
     public onClick: Function;                    // 自动匹配 onXxx
 
     @Emit('onCustomEvent')
-    public handler: Function;                    // 自定义事件名
+    public handleCustomEvent: Function;                    // 自定义事件名
 
-    public doClick(e) {
+    public handleClick(e) {
         const result = this.onClick(e);          // 调用回调并获取返回值
     }
 }

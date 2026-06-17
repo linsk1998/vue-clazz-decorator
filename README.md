@@ -13,24 +13,24 @@
 + 兼容 reflect-metadata API
 + 完整的数据模型层：序列化/反序列化/类型转换
 
-如果你喜欢已经废弃的 vue-class-component 或 vue-property-decorator, 那么请试试这个项目吧！
+如果你喜欢 vue-class-component 或 vue-property-decorator, 那么请试试这个项目吧！
 
 ## 功能清单
 
 | 分类 | API |
 | --- | --- |
-| 组件创建 | [createComponent](docs/component.md) [use](docs/component.md) [useChildren](docs/component.md) |
-| 类装饰器 | [@ViewModel](docs/component.md) [@Model](docs/model.md) [@Component](docs/component.md) |
-| 数据装饰器 | [@State](docs/component.md) [@Reactive](docs/component.md) [@Computed](docs/component.md) [@Ref](docs/component.md) |
-| 组件通信装饰器 | [@Prop](docs/component.md) [@Emit](docs/component.md) [@ModelValue](docs/component.md) [@Provide](docs/component.md) [@Inject](docs/component.md) |
-| 生命周期装饰器 | [@OnDidCreate](docs/component.md) [@OnWillMount](docs/component.md) [@OnDidMount](docs/component.md) [@OnWillUpdate](docs/component.md) [@OnDidUpdate](docs/component.md) [@OnWillUnmount](docs/component.md) [@OnDidUnmount](docs/component.md) [@OnDidCatch](docs/component.md) |
-| JSON 序列化装饰器 | [@JsonProperty](docs/model.md) [@JsonExpose](docs/model.md) [@JsonIgnore](docs/model.md) [@JsonSerialize](docs/model.md) [@JsonDeserialize](docs/model.md) [@JsonFormat](docs/model.md) |
-| 数据类型装饰器 | [@Type](docs/model.md) [ArrayType](docs/model.md) [ReactiveArrayType](docs/model.md) [@From](docs/model.md) |
-| 元数据操作函数 | [metadata](docs/metadata.md) [defineMetadata](docs/metadata.md) [defineClassMetadata](docs/metadata.md) [defineFieldMetadata](docs/metadata.md) [getClassMetadataValues](docs/metadata.md) [getFieldMetadataValues](docs/metadata.md) |
-| 元数据查询函数 | [getMetadata](docs/metadata.md) [getOwnMetadata](docs/metadata.md) [getMetadataKeys](docs/metadata.md) [getOwnMetadataKeys](docs/metadata.md) [hasMetadata](docs/metadata.md) [hasOwnMetadata](docs/metadata.md) [deleteMetadata](docs/metadata.md) |
-| 兼容 reflect-metadata 函数 | [metadata](docs/metadata.md) [hasOwnMetadata](docs/metadata.md) [getOwnMetadataKeys](docs/metadata.md) [getOwnMetadata](docs/metadata.md) [getMetadata](docs/metadata.md) [deleteMetadata](docs/metadata.md) [defineMetadata](docs/metadata.md) |
-| 模型实例化函数 | [reactive](docs/model.md) [normalize](docs/model.md) [hydrate](docs/model.md) |
-| 其他导出 | [nextTick](docs/api.md) [state](docs/api.md) [computed](docs/api.md) |
+| 组件创建 | [createComponent](docs/component.md#createcomponent) [use](#组件逻辑复用) [useChildren](docs/component.md#子组件) |
+| 类装饰器 | [@ViewModel](docs/component.md#viewmodel) [@Model](docs/model.md#model-声明一个模型) |
+| 数据装饰器 | [@State](docs/component.md#state) [@Reactive](docs/component.md#reactive) [@Computed](docs/component.md#computed) [@Ref](docs/component.md#ref) |
+| 组件通信装饰器 | [@Prop](docs/component.md#prop) [@Emit](docs/component.md#emit) [@ModelValue](docs/component.md#modelvalue) [@Provide](docs/component.md#provide--inject) [@Inject](docs/component.md#provide--inject) |
+| 生命周期装饰器 | [@OnDidCreate](docs/component.md#生命周期) [@OnWillMount](docs/component.md#生命周期) [@OnDidMount](docs/component.md#生命周期) [@OnWillUpdate](docs/component.md#生命周期) [@OnDidUpdate](docs/component.md#生命周期) [@OnWillUnmount](docs/component.md#生命周期) [@OnDidUnmount](docs/component.md#生命周期) [@OnDidCatch](docs/component.md#生命周期) |
+| JSON 序列化装饰器 | [@JsonProperty](docs/model.md#jsonproperty-指定-json-键名) [@JsonExpose](docs/model.md#jsonexpose-控制序列化方向) [@JsonIgnore](docs/model.md#jsonignore-忽略属性) [@JsonSerialize](docs/model.md#jsonserialize--jsondeserialize-自定义序列化逻辑) [@JsonDeserialize](docs/model.md#jsonserialize--jsondeserialize-自定义序列化逻辑) [@JsonFormat](docs/model.md#jsonformat-日期格式化) |
+| 数据类型装饰器 | [@Type](docs/model.md#type-指定字段类型) [ArrayType](docs/model.md#arraytype--reactivearraytype) [ReactiveArrayType](docs/model.md#arraytype--reactivearraytype) [@From](docs/model.md#from-复用字段配置) |
+| 元数据操作函数 | [metadata](docs/metadata.md#metadata) [defineMetadata](docs/metadata.md#definemetadata) [defineClassMetadata](docs/metadata.md#defineclassmetadata) [defineFieldMetadata](docs/metadata.md#definefieldmetadata) [getClassMetadataValues](docs/metadata.md#getclassmetadatavalues) [getFieldMetadataValues](docs/metadata.md#getfieldmetadatavalues) |
+| 元数据查询函数 | [getMetadata](docs/metadata.md#getmetadata) [getOwnMetadata](docs/metadata.md#getownmetadata) [getMetadataKeys](docs/metadata.md#getmetadatakeys) [getOwnMetadataKeys](docs/metadata.md#getownmetadatakeys) [hasMetadata](docs/metadata.md#hasmetadata) [hasOwnMetadata](docs/metadata.md#hasownmetadata) [deleteMetadata](docs/metadata.md#deletemetadata) |
+| 兼容 reflect-metadata 函数 | [metadata](docs/metadata.md#metadata) [hasOwnMetadata](docs/metadata.md#hasownmetadata) [getOwnMetadataKeys](docs/metadata.md#getownmetadatakeys) [getOwnMetadata](docs/metadata.md#getownmetadata) [getMetadata](docs/metadata.md#getmetadata) [deleteMetadata](docs/metadata.md#deletemetadata) [defineMetadata](docs/metadata.md#definemetadata) |
+| 模型实例化函数 | [reactive](docs/model.md#reactive-创建响应式实例) [normalize](docs/model.md#normalize-对象规范化) [hydrate](docs/model.md#hydrate-对象水合) |
+| 其他导出 | [nextTick](docs/api.md#nexttick) [state](docs/api.md#state) [computed](docs/api.md#computed) |
 
 ## 创建组件
 

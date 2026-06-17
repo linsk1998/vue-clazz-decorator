@@ -1,6 +1,6 @@
 {
 	"name": "vue-clazz-decorator",
-	"version": "0.0.0",
+	"version": "0.0.1",
 	"description": "Write Vue 3 components with Class + Decorators, featuring ViewModel/View separation, metadata system, and reactive model layer.",
 	"main": "dist/index.cjs",
 	"module": "dist/index.mjs",
