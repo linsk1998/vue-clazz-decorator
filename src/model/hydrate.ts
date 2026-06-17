@@ -1,4 +1,4 @@
-import { enumMember } from "@/enumMenber";
+import { enumMember } from "@/enumMember";
 import { fieldWeakMap } from "@/metadata/defineFieldMetadata";
 import { getFieldMetadataValues } from "@/metadata/getFieldMetadataValues";
 import { getOwnMetadata } from "@/metadata/getOwnMetadata";

@@ -1,4 +1,4 @@
-import { enumMember } from "@/enumMenber";
+import { enumMember } from "@/enumMember";
 import { getClassMetadataValues } from "@/metadata/getClassMetadataValues";
 import { getFieldMetadataValues } from "@/metadata/getFieldMetadataValues";
 import { hydrate } from "@/model/hydrate";

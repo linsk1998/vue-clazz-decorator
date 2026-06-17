@@ -1,5 +1,9 @@
 `vue-clazz-decorator` 让你在 Vue 3 中使用 **Class + 装饰器** 的风格来写组件。
 
+[![npm version](https://img.shields.io/npm/v/vue-clazz-decorator.svg)](https://www.npmjs.com/package/vue-clazz-decorator)
+[![license](https://img.shields.io/npm/l/vue-clazz-decorator.svg)](https://github.com/linsk1998/vue-clazz-decorator/blob/main/LICENSE)
+[![CI](https://github.com/linsk1998/vue-clazz-decorator/actions/workflows/ci.yml/badge.svg)](https://github.com/linsk1998/vue-clazz-decorator/actions/workflows/ci.yml)
+
 ## 特色
 
 + 通过类的方式来写 Vue 组件
