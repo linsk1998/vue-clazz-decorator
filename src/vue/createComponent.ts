@@ -1,5 +1,5 @@
 import { getFieldMetadataValues } from "@/metadata/getFieldMetadataValues";
-import { getCurrentInstance, shallowRef } from "vue";
+import { getCurrentInstance, h, shallowRef } from "vue";
 import type { JSX } from "vue/jsx-runtime";
 import { use } from "./use";
 
@@ -10,10 +10,18 @@ export type VueJsxComponent<T> = {
 };
 
 /** 创建组件 */
+function createComponent<T>(template: VueJsxComponent<T>): VueJsxComponent<T>;
+function createComponent<T>(template: VueJsxComponent<T>, Class: ViewModel<T>): VueJsxComponent<T>;
 function createComponent<T>(template: Template<T>): Template<T>;
 function createComponent<T>(template: Template<T>, Class: ViewModel<T>): VueJsxComponent<T>;
-function createComponent<T>(template: Template<any>, Class?: { new(props?: Record<string, any>): object; }): VueJsxComponent<T> | Template<T> {
+function createComponent<T>(template: any, Class?: { new(props?: Record<string, any>): object; }): VueJsxComponent<T> | Template<T> {
 	if(!Class) return template;
+	if(typeof template === 'object') {
+		let Tag = template;
+		template = function(props, { slots }) {
+			return h(Tag, props, slots);
+		};
+	}
 	let props = new Set<string>();
 	let emits = new Set<string>();
 	let metadata = getFieldMetadataValues(Class);
@@ -49,7 +57,7 @@ function createComponent<T>(template: Template<any>, Class?: { new(props?: Recor
 		},
 		render(proxyToUse, renderCache, props, setupState, data, ctx) {
 			let vueInst = getCurrentInstance();
-			return template(vueInst.exposed);
+			return template(vueInst.exposed, vueInst);
 		}
 	} as any;
 }
