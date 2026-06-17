@@ -58,9 +58,20 @@ getOwnMetadata('label', MyClass, 'name');
 
 ---
 
+## getMetadataKeys
+
+获取类或字段上所有元数据的键名，**沿原型链向上查找**。
+
+```ts
+getMetadataKeys(MyClass);              // => ['version', ...]
+getMetadataKeys(MyClass, 'name');      // => ['label', ...]
+```
+
+---
+
 ## getOwnMetadataKeys
 
-获取当前类/字段上所有元数据的键名。
+获取当前类/字段上所有元数据的键名，**仅自身，不含原型链**。
 
 ```ts
 getOwnMetadataKeys(MyClass);              // => ['version']
@@ -69,9 +80,20 @@ getOwnMetadataKeys(MyClass, 'name');      // => ['label']
 
 ---
 
+## hasMetadata
+
+检查是否存在指定元数据，**沿原型链向上查找**。
+
+```ts
+hasMetadata('version', MyClass);        // => true
+hasMetadata('label', MyClass, 'name');  // => true
+```
+
+---
+
 ## hasOwnMetadata
 
-检查是否存在指定元数据。
+检查是否存在指定元数据，**仅当前类自身**。
 
 ```ts
 hasOwnMetadata('version', MyClass);        // => true
@@ -87,6 +109,26 @@ hasOwnMetadata('label', MyClass, 'name');  // => true
 ```ts
 deleteMetadata('version', MyClass);         // => true
 deleteMetadata('label', MyClass, 'name');   // => true
+```
+
+---
+
+## defineClassMetadata
+
+在类级别定义元数据。
+
+```ts
+defineClassMetadata(Class, 'version', '1.0');
+```
+
+---
+
+## defineFieldMetadata
+
+在字段级别定义元数据。
+
+```ts
+defineFieldMetadata(Class, 'name', 'label', '用户名');
 ```
 
 ---
@@ -133,5 +175,6 @@ class Child extends Base {
 
 getMetadata('prop', Child, 'name');    // => 从 Base 继承找到
 getOwnMetadata('prop', Child, 'name'); // => undefined（Child 自身没有）
+hasMetadata('prop', Child, 'name');    // => true（沿原型链找到）
 getFieldMetadataValues(Child);          // => { name: {prop}, count: {state} }
 ```

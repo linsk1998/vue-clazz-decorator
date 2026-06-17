@@ -35,6 +35,8 @@ export default defineConfig({
 });
 ```
 
+> 为了让 typescrip t插件编译完，再给 vueJsx 插件编译，需要调整 vueJsx 的执行顺序，后文有详细示例
+
 ### 在现有项目中接入
 
 确保项目已使用 Vue 3，且构建工具支持 JSX（Vite、Webpack、Rollup 均可）。
@@ -49,24 +51,9 @@ pnpm add vue-clazz-decorator
 
 `vue-clazz-decorator` 支持多种装饰器编译方式，**功能完全一致，选一个适合你的即可**。
 
-### A) TypeScript Experimental Decorators（推荐）
+### A) TypeScript Proposal 装饰器
 
-TypeScript 长期支持的传统装饰器，生态成熟，类型推断完善。在 `tsconfig.json` 中配置：
-
-```json
-{
-  "compilerOptions": {
-    "experimentalDecorators": true,
-    "useDefineForClassFields": false
-  }
-}
-```
-
-文件后缀用 `.ts` 或 `.tsx`。
-
-### B) TypeScript 标准装饰器
-
-TypeScript 5.0+ 支持 TC39 标准语法。在 `tsconfig.json` 中配置：
+TypeScript 5.4+ 支持 TC39 Proposal语法，类型推断完善。在 `tsconfig.json` 中配置：
 
 ```json
 {
@@ -77,26 +64,39 @@ TypeScript 5.0+ 支持 TC39 标准语法。在 `tsconfig.json` 中配置：
 }
 ```
 
+### B) TypeScript Experimental Decorators
+
+TypeScript 长期支持的传统装饰器，生态成熟，支持类型注入和参数装饰器。在 `tsconfig.json` 中配置：
+
+```json
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false
+  }
+}
+```
+
 ### C) Babel Proposal Decorators
 
-ECMAScript 标准化中的装饰器语法。需要 Babel 插件：
-
-```bash
-pnpm add -D @babel/plugin-proposal-decorators
-```
+需要 Babel 插件 ` @babel/plugin-proposal-decorators`:
 
 ```json
 {
   "plugins": [
     ["@babel/plugin-proposal-decorators", { "version": "2023-11" }],
-    ["@babel/plugin-proposal-class-properties", { "setPublicClassFields": false }]
+    ["@babel/plugin-proposal-class-properties", { "loose": false }]
   ]
 }
 ```
 
-文件后缀用 `.js` 或 `.jsx`。
-
-> 下文的示例全部使用 **Experimental Decorators + TSX**。如果你使用其他方式，只需要调整文件后缀和类型注解。
+完整编译示例：
+ + [typescript](https://github.com/linsk1998/vue-clazz-decorator/tree/main/tests/vitest.proposal.config.js)
+ + [babel](https://github.com/linsk1998/vue-clazz-decorator/tree/main/tests/vitest.babel-proposal.config.js)
+ + [typescript + experimental + 字段set语义](https://github.com/linsk1998/vue-clazz-decorator/tree/main/tests/vitest.experimental.config.js)
+ + [babel + experimental + 字段set语义](https://github.com/linsk1998/vue-clazz-decorator/tree/main/tests/vitest.babel-experimental.config.js)
+ + [typescript + experimental + 字段set语义 + emitDecoratorMetadata](https://github.com/linsk1998/vue-clazz-decorator/tree/main/tests/vitest.metadata-experimental.config.js)
+ + [babel + experimental + 字段set语义 + emitDecoratorMetadata](https://github.com/linsk1998/vue-clazz-decorator/tree/main/tests/vitest.metadata-babel-experimental.config.js)
 
 ---
 
@@ -108,7 +108,7 @@ pnpm add -D @babel/plugin-proposal-decorators
 
 用 `@ViewModel` 标记类，用 `@State` 声明响应式状态：
 
-```tsx
+```ts
 import { ViewModel, State, Computed } from 'vue-clazz-decorator';
 
 @ViewModel
@@ -145,7 +145,7 @@ export function CounterView(props: CounterViewModel) {
 
 ### 步骤 3：绑定成组件
 
-```tsx
+```ts
 import { createComponent } from 'vue-clazz-decorator';
 
 export const Counter = createComponent(CounterView, CounterViewModel);
@@ -209,6 +209,9 @@ export const Hello = createComponent(function Hello() {
 
 ## 下一步
 
-- 想理解 ViewModel 与模板分离的设计思想？阅读 [组件开发](component.md)
-- 想了解每个装饰器的详细用法？阅读 [元数据操作](matadata.md)
-- 想看常见开发场景？阅读 [数据模型](model.md)
+- 想了解所有装饰器的详细用法？阅读 [组件开发](component.md)
+- 想了解元数据的增删改查？阅读 [元数据操作](metadata.md)
+- 想了解数据模型的序列化/反序列化？阅读 [数据模型](model.md)
+- 想了解构建配置和进阶用法？阅读 [进阶用法](advanced.md)
+- 想快速查找 API 签名？阅读 [API 参考](api.md)
+- 遇到问题？阅读 [常见问题](faq.md)

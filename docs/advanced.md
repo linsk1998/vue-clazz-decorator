@@ -2,7 +2,7 @@
 
 本章涵盖构建方式等进阶用法。
 
-------------
+---
 
 ## emitDecoratorMetadata 类型元数据
 
@@ -133,3 +133,65 @@ getMetadata('design:type', target, 'name');
 ```
 
 之后 IDE 即可识别 `Reflect.metadata`、`Reflect.getMetadata`、`Reflect.defineMetadata` 等全局方法。
+
+---
+
+## reactive / normalize / hydrate 选择指南
+
+三种实例化方式各有适用场景：
+
+| 场景 | 推荐 | 原因 |
+| ---- | ---- | ---- |
+| ViewModel 中使用 | `use()` | 自动集成 Vue 组件生命周期 |
+| 需要 Vue 响应式的独立模型 | `reactive()` | 所有字段都是响应式的 |
+| 需要部分响应式的复杂模型 | `hydrate()` | 仅标注字段响应式，性能更优 |
+| 不需要响应式（工具端/Worker） | `normalize()` | 零响应式开销 |
+| 快速类型转换 | `normalize()` | 一次性处理，结果为纯对象 |
+
+---
+
+## 自定义装饰器
+
+利用 `metadata()` 装饰器工厂，可以轻松创建自定义装饰器：
+
+```tsx
+import { metadata, getFieldMetadataValues, ViewModel, State, createComponent } from 'vue-clazz-decorator';
+
+// 创建自定义装饰器
+const Label = (text: string) => metadata('label', text);
+const Required = metadata('required', true);
+const Readonly = metadata('readonly', true);
+
+@ViewModel
+class FormViewModel {
+    @Label('用户名')
+    @Required
+    @State
+    public username = '';
+
+    @Label('备注')
+    @Readonly
+    @State
+    public remark = '';
+}
+
+// 运行时读取元数据，生成表单
+function FormView(props: FormViewModel) {
+    const meta = getFieldMetadataValues(FormViewModel);
+    return <form>
+        {Object.entries(meta).map(([key, config]) => (
+            <div key={key}>
+                <label>{config.label}</label>
+                <input
+                    value={props[key]}
+                    onInput={(e) => { props[key] = e.target.value; }}
+                    required={!!config.required}
+                    readOnly={!!config.readonly}
+                />
+            </div>
+        ))}
+    </form>;
+}
+```
+
+这种模式非常适合构建低代码平台、动态表单等场景。
