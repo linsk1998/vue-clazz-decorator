@@ -2,7 +2,7 @@
 
 ## @Model 声明一个模型
 
-`@Model` 会自动注入 `.toJSON()` 方法，`JSON.stringify(instance)` 时按 `@JsonProperty`、`@JsonIgnore`、`@JsonSerialize` 等规则序列化。
+`@Model` 会自动注入 `.toJSON()` 方法，`JSON.stringify(instance)` 时按 `@JsonProperty`、`@JsonIgnore`、`@JsonSerialize`、`@JsonFormat` 等规则序列化。
 
 ```typescript
 @Model
@@ -87,6 +87,30 @@ public name: string;
 ```
 
 多个自定义函数采用洋葱模型叠加执行。
+
+## @JsonFormat 日期格式化
+
+自动注册序列化与反序列化钩子，处理 `Date` 与格式化字符串/时间戳之间的互转。
+
+### 日期字符串模式
+
+```typescript
+@JsonFormat("yyyy-MM-dd HH:mm:ss")                    // Date ↔ "2023-06-15 15:30:45"
+@JsonFormat("yyyy-MM-dd HH:mm:ss", +8)                // 东八区
+@JsonFormat({ pattern: "yyyy-MM-dd HH:mm:ss" })        // 省略时区 → 本地时间
+@JsonFormat({ pattern: "yyyy-MM-dd HH:mm:ss", timezone: +8 })  // 指定时区偏移
+```
+
+序列化时 `Date` 转为格式化的日期字符串，反序列化时将符合格式的字符串解析为 `Date`。不匹配格式的字符串解析后为无效 `Date`。
+
+### 时间戳模式
+
+```typescript
+@JsonFormat(Number)                  // Date ↔ 毫秒时间戳
+@JsonFormat({ shape: Number })       // 对象形式
+```
+
+序列化时 `Date` 转为时间戳数字，反序列化时将数字转为Date。
 
 ## @From 复用字段配置
 

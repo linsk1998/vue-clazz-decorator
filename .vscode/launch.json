@@ -9,7 +9,7 @@
 				"${workspaceFolder}/node_modules/vitest/vitest.mjs",
 				"${file}",
 				"-c",
-				"tests/vitest.metadata-babel-experimental.config.js",
+				"tests/vitest.babel-proposal.config.js",
 				"--watch=false",
 				"--test-timeout=0"
 			],

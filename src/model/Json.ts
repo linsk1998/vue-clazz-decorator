@@ -1,4 +1,5 @@
 import { metadata } from "@/metadata/metadata";
+import SimpleDateFormat from "java.text.simple-date-format";
 import type { EsAccessorDecorator, EsFieldDecorator, EsGetterDecorator, EsSetterDecorator, LegacyAccessorDecorator, LegacyPropertyDecorator } from "../decorator/types";
 import { ensureMetadata } from "../ensureMetadata";
 import { defineFieldMetadata, fieldWeakMap } from "../metadata/defineFieldMetadata";
@@ -81,5 +82,80 @@ export function JsonDeserialize<This extends object, Value>(fn: NextHandleFuncti
 			defineFieldMetadata('deserialize', fns, metadata, property);
 		}
 		fns.push(fn);
+	};
+}
+
+function shiftTimezone(date: Date, hours: number): Date {
+	var localOffset = -date.getTimezoneOffset() * 60000;
+	var targetOffset = hours * 3600000;
+	return new Date(date.getTime() + targetOffset - localOffset);
+}
+
+function unshiftTimezone(date: Date, hours: number): Date {
+	var localOffset = -date.getTimezoneOffset() * 60000;
+	var targetOffset = hours * 3600000;
+	return new Date(date.getTime() + localOffset - targetOffset);
+}
+
+/** 日期格式化与解析，自动注册序列化与反序列化钩子 */
+export function JsonFormat<This extends object = any>(shape: NumberConstructor): FieldDecorator<This, Date>;
+export function JsonFormat<This extends object = any>(pattern: string, timezone?: number): FieldDecorator<This, Date>;
+export function JsonFormat<This extends object = any>(options: { pattern: string; timezone?: number; }): FieldDecorator<This, Date>;
+export function JsonFormat<This extends object = any>(options: { shape: NumberConstructor; }): FieldDecorator<This, Date>;
+export function JsonFormat<This extends object = any>(pattern: string | NumberConstructor | { pattern?: string; timezone?: number; shape?: NumberConstructor; }, timezone?: number): FieldDecorator<This, Date> {
+	var _pattern: string;
+	var _timezone: number | undefined;
+	var _isTimestamp: boolean;
+	if(typeof pattern === "function") {
+		_isTimestamp = true;
+	} else if(typeof pattern === "object") {
+		if((pattern as any).shape === Number) {
+			_isTimestamp = true;
+		} else {
+			_pattern = (pattern as any).pattern;
+			_timezone = (pattern as any).timezone;
+		}
+	} else {
+		_pattern = pattern as string;
+		_timezone = timezone;
+	}
+	return function(target: any, context: any) {
+		if(_isTimestamp) {
+			// 时间戳模式: Date ↔ number
+			JsonSerialize(function(value: any, _config: any, next: NextFunction) {
+				if(value instanceof Date && !isNaN(value.valueOf())) {
+					return value.getTime();
+				}
+				return next(value);
+			})(target, context);
+			JsonDeserialize(function(value: any, _config: any, next: NextFunction) {
+				return new Date(value);
+			})(target, context);
+		} else {
+			// 日期字符串模式: Date ↔ 格式化字符串
+			// 序列化: Date → 格式化字符串
+			JsonSerialize(function(value: any, _config: any, next: NextFunction) {
+				if(value instanceof Date && !isNaN(value.valueOf())) {
+					var date = _timezone !== undefined ? shiftTimezone(value, _timezone) : value;
+					var formatter = new SimpleDateFormat(_pattern);
+					return formatter.format(date);
+				}
+				return next(value);
+			})(target, context);
+			// 反序列化: 格式化字符串 → Date
+			JsonDeserialize(function(value: any, _config: any, next: NextFunction) {
+				if(typeof value === "string") {
+					var formatter = new SimpleDateFormat(_pattern);
+					var date = formatter.parse(value);
+					if(!isNaN(date.valueOf())) {
+						if(_timezone !== undefined) {
+							date = unshiftTimezone(date, _timezone);
+						}
+					}
+					return date;
+				}
+				return next(value);
+			})(target, context);
+		}
 	};
 }
