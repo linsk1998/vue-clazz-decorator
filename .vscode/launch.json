@@ -20,7 +20,7 @@
 			]
 		},
 		{
-			"name": "Vitest: Current File With setPublicClassFields",
+			"name": "Vitest: Current File With experimentalDecorators",
 			"type": "node",
 			"request": "launch",
 			"runtimeArgs": [

@@ -1,3 +1,4 @@
+const { nodeResolve } = require("@rollup/plugin-node-resolve");
 const inject = require("@rollup/plugin-inject");
 const typescript = require("@rollup/plugin-typescript");
 const vue = require("@vitejs/plugin-vue");
@@ -20,6 +21,14 @@ module.exports = defineConfig(function({ command, mode }) {
 		},
 		esbuild: false,
 		plugins: [
+			(function() {
+				let plugin = nodeResolve({
+					browser: true
+				});
+				plugin.resolveId.order = undefined;
+				plugin.enforce = "pre";
+				return plugin;
+			})(),
 			{
 				...sky('es2015'),
 				enforce: "pre"
@@ -82,7 +91,7 @@ module.exports = defineConfig(function({ command, mode }) {
 		],
 		optimizeDeps: {
 			include: [],
-			exclude: ['sky-core', '@babel/runtime']
+			exclude: ['sky-core', '@babel/runtime', 'tslib']
 		},
 		test: {
 			environment: 'jsdom',
@@ -92,6 +101,11 @@ module.exports = defineConfig(function({ command, mode }) {
 			},
 			include: ['tests/**/*.test.{js,jsx,tsx,tsx}'],
 			exclude: ['tests/metadata/proposal.test.js', 'tests/type-metadata/**', '**/node_modules/**'],
+			server: {
+				deps: {
+					inline: ['@babel/runtime', 'tslib', '@vue/test-utils', 'vue', '@vue/runtime-core', '@vue/runtime-dom']
+				},
+			}
 		},
 	};
 });
