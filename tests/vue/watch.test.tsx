@@ -1,6 +1,6 @@
+import { Model } from "@/model/Model";
 import { createComponent } from "@/vue/createComponent";
 import { OnDidCreate } from "@/vue/lifecycle";
-import { Model } from "@/model/Model";
 import { Reactive } from "@/vue/Reactive";
 import { State } from "@/vue/State";
 import { ViewModel } from "@/vue/ViewModel";

@@ -4,31 +4,21 @@ import { metadata } from "@/metadata/metadata";
 interface WatchOptions {
 	deep?: boolean;
 	immediate?: boolean;
-	flush?: 'pre' | 'post' | 'sync';
-	once?: boolean;
-	onTrack?: (event: any) => void;
-	onTrigger?: (event: any) => void;
 }
 
-type WatchSource = string | ((instance: any) => any) | (() => any);
+type WatchSource<This extends object, Value> = (this: This, instance: This) => Value;
+type WatchCallback<Value> = (newValue: Value, oldValue: Value) => any;
+type WatchDecorator<This extends object, Value extends WatchCallback<any>> = EsMethodDecorator<This, Value> & LegacyMethodDecorator<This>;
 
-type WatchDecorator<This extends object> =
-	EsMethodDecorator<This, any> & LegacyMethodDecorator<This>;
-
-const baseDecorator = metadata('watch', undefined);
-
-const Watch: WatchDecorator<object> & {
-	(source: WatchSource, options?: WatchOptions): WatchDecorator<object>;
-} = function(source: any, options?: WatchOptions) {
-	if(typeof source === 'string' || typeof source === 'function') {
-		if(typeof source === 'string') {
-			let key = source;
-			source = function(inst: any) { return inst[key]; };
-		}
-		return metadata('watch', { source, options });
+function Watch<This extends object, Value>(source: string, options?: WatchOptions): WatchDecorator<This, WatchCallback<Value>>;
+function Watch<This extends object, Value>(source: WatchSource<This, any>, options?: WatchOptions): WatchDecorator<This, WatchCallback<Value>>;
+function Watch(source: Function | string, options?: WatchOptions) {
+	if(typeof source === 'string') {
+		let key = source;
+		source = function() { return this[key]; };
 	}
-	return baseDecorator.apply(this, arguments);
-};
+	return metadata('watch', { source, options });
+}
 
 export { Watch };
-export type { WatchOptions, WatchSource };
+
