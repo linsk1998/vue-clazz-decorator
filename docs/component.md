@@ -279,6 +279,33 @@ class MyViewModel {
 
 ---
 
+## @Watch
+
+监听 ViewModel 中状态的变化。
+
+```ts
+@ViewModel
+class ChildViewModel {
+    @State
+    public name = 'initial';
+
+    @Watch('name')          // 监听某个成员，复杂的可以用computed
+    protected onNameChange(newValue: string, oldValue: string) {
+        console.log(`name changed from ${oldValue} to ${newValue}`);
+    }
+    @Watch(inst => inst.name) // 支持以回调的方式获取
+    protected onNameChange(newValue: string, oldValue: string) {
+        console.log(`name changed from ${oldValue} to ${newValue}`);
+    }
+    @Watch(function(){ return this.name }) // 也可以使用this
+    protected onNameChange(newValue: string, oldValue: string) {
+        console.log(`name changed from ${oldValue} to ${newValue}`);
+    }
+}
+```
+
+---
+
 ## 生命周期
 
 方法装饰器，对应 Vue 3 生命周期钩子。

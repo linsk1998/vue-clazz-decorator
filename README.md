@@ -169,7 +169,7 @@ getMetadataValues(UserBo);
 | --- | --- |
 | 组件创建 | [createComponent](docs/component.md#createcomponent) [use](#组件逻辑复用) [useChildren](docs/component.md#子组件) |
 | 类装饰器 | [@ViewModel](docs/component.md#viewmodel) [@Model](docs/model.md#model-声明一个模型) |
-| 数据装饰器 | [@State](docs/component.md#state) [@Reactive](docs/component.md#reactive) [@Computed](docs/component.md#computed) [@Ref](docs/component.md#ref) |
+| 数据装饰器 | [@State](docs/component.md#state) [@Reactive](docs/component.md#reactive) [@Computed](docs/component.md#computed) [@Ref](docs/component.md#ref) [@Watch](docs/component.md#watch) |
 | 组件通信装饰器 | [@Prop](docs/component.md#prop) [@Emit](docs/component.md#emit) [@ModelValue](docs/component.md#modelvalue) [@Provide](docs/component.md#provide--inject) [@Inject](docs/component.md#provide--inject) |
 | 生命周期装饰器 | [@OnDidCreate](docs/component.md#生命周期) [@OnWillMount](docs/component.md#生命周期) [@OnDidMount](docs/component.md#生命周期) [@OnWillUpdate](docs/component.md#生命周期) [@OnDidUpdate](docs/component.md#生命周期) [@OnWillUnmount](docs/component.md#生命周期) [@OnDidUnmount](docs/component.md#生命周期) [@OnDidCatch](docs/component.md#生命周期) |
 | JSON 序列化装饰器 | [@JsonProperty](docs/model.md#jsonproperty-指定-json-键名) [@JsonExpose](docs/model.md#jsonexpose-控制序列化方向) [@JsonIgnore](docs/model.md#jsonignore-忽略属性) [@JsonSerialize](docs/model.md#jsonserialize--jsondeserialize-自定义序列化逻辑) [@JsonDeserialize](docs/model.md#jsonserialize--jsondeserialize-自定义序列化逻辑) [@JsonFormat](docs/model.md#jsonformat-日期格式化) |

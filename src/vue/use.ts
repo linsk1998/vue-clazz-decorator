@@ -14,7 +14,8 @@ import {
 	onErrorCaptured,
 	onMounted,
 	onUnmounted,
-	onUpdated
+	onUpdated,
+	watch
 } from "vue";
 import { Accessor, ACCESSOR_MAP } from "./ACCESSOR_MAP";
 
@@ -35,6 +36,7 @@ export function use<T extends object>(Class: { new(props?: Record<string, any>):
 	let metadata = getFieldMetadataValues(Class);
 	let inst = new Class(vueInst.props);
 	let accessors = {};
+	let methods = [];
 	enumMember(inst, function(key, descriptor) {
 		let fieldConfig = metadata[key];
 		if('value' in descriptor) {
@@ -47,6 +49,7 @@ export function use<T extends object>(Class: { new(props?: Record<string, any>):
 					writable: false,
 					value: method
 				});
+				methods.push(key);
 				if(fieldConfig) {
 					if('provide' in fieldConfig) $provide(fieldConfig.provide || key, createProvideAccessor(key, method));
 				}
@@ -54,6 +57,11 @@ export function use<T extends object>(Class: { new(props?: Record<string, any>):
 			}
 		}
 		if(fieldConfig) {
+			if(process.env.NODE_ENV !== 'production') {
+				if(fieldConfig.watch) {
+					console.warn(`watch is only allowed on methods`);
+				}
+			}
 			let provide = 'provide' in fieldConfig;
 			if('emit' in fieldConfig) {
 				let method = createEmitMethod(inst, vueInst, fieldConfig.emit || key);
@@ -178,6 +186,13 @@ export function use<T extends object>(Class: { new(props?: Record<string, any>):
 			}
 		}
 	}
+	methods.forEach(key => {
+		let fieldConfig = metadata[key];
+		if(fieldConfig && fieldConfig.watch) {
+			let { source, options } = fieldConfig.watch;
+			onBeforeUnmount(watch(() => source.call(inst, inst), inst[key], options));
+		}
+	});
 
 	return inst;
 }

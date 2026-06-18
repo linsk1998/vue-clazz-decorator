@@ -32,4 +32,5 @@ export * from "./vue/State";
 export * from "./vue/use";
 export * from "./vue/useChildren";
 export * from "./vue/ViewModel";
+export * from "./vue/Watch";
 
