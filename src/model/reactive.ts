@@ -3,7 +3,7 @@ import { fieldWeakMap } from "@/metadata/defineFieldMetadata";
 import { getFieldMetadataValues } from "@/metadata/getFieldMetadataValues";
 import { getOwnMetadata } from "@/metadata/getOwnMetadata";
 import { ACCESSOR_MAP } from "@/vue/ACCESSOR_MAP";
-import { computed, shallowRef } from "vue";
+import { computed, shallowRef, type ShallowRef } from "vue";
 import { array, INSTANTIATE, REACTIVE, TYPE } from "./array";
 import { applyOnionDeserialize } from "./deserialize";
 
@@ -132,8 +132,9 @@ export { reactive };
 
 
 export function createStateAccessor(initValue: any, Class?: any, instantiate?: InstantiateFunction) {
-	const refContainer = shallowRef(initValue);
+	var refContainer: ShallowRef;
 	if(Class) {
+		refContainer = shallowRef(instantiate(initValue, Class));
 		return {
 			get() {
 				return refContainer.value;
@@ -143,6 +144,7 @@ export function createStateAccessor(initValue: any, Class?: any, instantiate?: I
 			}
 		};
 	}
+	refContainer = shallowRef(initValue);
 	return {
 		get() {
 			return refContainer.value;

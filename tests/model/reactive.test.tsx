@@ -99,6 +99,48 @@ describe('reactive', () => {
 		expect(accessors.dept).toBeDefined();
 	});
 
+	it('@Reactive with initial value converts to model instance', () => {
+		@Model
+		class Dept {
+			public deptId: string;
+			public deptName: string;
+		}
+
+		@Model
+		class User {
+			public id: string;
+
+			@Reactive(Dept)
+			public dept: Dept = { deptId: '123', deptName: '初始部门' };
+		}
+
+		var user = reactive({ id: "u1" }, User);
+		expect(user.dept instanceof Dept).toBe(true);
+		expect(user.dept.deptId).toBe("123");
+		expect(user.dept.deptName).toBe("初始部门");
+	});
+
+	it('@Reactive with initial value overridden by data', () => {
+		@Model
+		class Dept {
+			public deptId: string;
+			public deptName: string;
+		}
+
+		@Model
+		class User {
+			public id: string;
+
+			@Reactive(Dept)
+			public dept: Dept = { deptId: '123', deptName: '默认部门' };
+		}
+
+		var user = reactive({ id: "u1", dept: { deptId: "d1", deptName: "技术部" } }, User);
+		expect(user.dept instanceof Dept).toBe(true);
+		expect(user.dept.deptId).toBe("d1");
+		expect(user.dept.deptName).toBe("技术部");
+	});
+
 	it('@Reactive without type', () => {
 		@Model
 		class UserBo {

@@ -9,3 +9,8 @@ export type LegacyMethodDecorator<This extends object> = (target: This, property
 export type LegacyAccessorDecorator<This extends object> = (target: This, property: string, descriptor?: PropertyDescriptor) => any;
 export type LegacyPropertyDecorator<This extends object> = (target: This, to: string) => any;
 export type LegacyClassDecorator = (Com: Function) => void;
+
+export type MethodDecorator<This extends object, Value extends (...args: any[]) => any> = EsMethodDecorator<This, Value> & LegacyMethodDecorator<This>;
+export type AccessorDecorator<This extends object, Value = any> = EsGetterDecorator<This, Value> & EsSetterDecorator<This, Value> & LegacyAccessorDecorator<This>;
+export type FieldDecorator<This extends object, Value = any> = EsFieldDecorator<This, Value> & EsAccessorDecorator<This, Value> & LegacyPropertyDecorator<This>;
+export type ClassDecorator<This extends object> = EsClassDecorator<This> & LegacyClassDecorator;

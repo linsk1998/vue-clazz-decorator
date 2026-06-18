@@ -4,6 +4,7 @@ import { Model } from '@/model/Model';
 import { Type } from '@/model/Type';
 import { ACCESSOR_MAP } from '@/vue/ACCESSOR_MAP';
 import { Computed } from '@/vue/Computed';
+import { Reactive } from '@/vue/Reactive';
 import { State } from '@/vue/State';
 import { describe, expect, it } from 'vitest';
 
@@ -108,5 +109,26 @@ describe('hydrate', () => {
 		}
 		expect(hydrate(null, UserBo)).toBeNull();
 		expect(hydrate(undefined, UserBo)).toBeUndefined();
+	});
+
+	it('hydrate with @Reactive initial value converts to model instance', () => {
+		@Model
+		class Dept {
+			public deptId: string;
+			public deptName: string;
+		}
+
+		@Model
+		class User {
+			public id: string;
+
+			@Reactive(Dept)
+			public dept: Dept = { deptId: '123', deptName: '初始部门' };
+		}
+
+		var user = hydrate({ id: "u1" }, User);
+		expect(user.dept instanceof Dept).toBe(true);
+		expect(user.dept.deptId).toBe("123");
+		expect(user.dept.deptName).toBe("初始部门");
 	});
 });
