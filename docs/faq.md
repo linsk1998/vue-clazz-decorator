@@ -8,6 +8,10 @@
 
 `vue-clazz-decorator` 是一个**独立的库**，灵感来源于 Vue 2 的 `vue-class-component` 和 `vue-property-decorator`，但完全为 Vue 3 重新设计。它基于 Vue 3 的原生响应式系统，不依赖任何已废弃的 Vue API。
 
+### 这个项目 内部是 Options API 还是 Composition API？
+
+内部是 Composition API，且在配置 `__VUE_OPTIONS_API__: false` 下通过所有测试。
+
 ### 可以和 Options API / Composition API 混用吗？
 
 可以。`createComponent` 生成的就是标准 Vue 组件，可以和其他 API 风格的组件一起使用。

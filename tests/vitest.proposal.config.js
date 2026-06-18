@@ -21,6 +21,10 @@ module.exports = defineConfig(function({ command, mode }) {
 		},
 		esbuild: false,
 		plugins: [
+			{
+				...sky('es2015'),
+				enforce: "pre"
+			},
 			(function() {
 				let plugin = nodeResolve({
 					browser: true
@@ -30,15 +34,11 @@ module.exports = defineConfig(function({ command, mode }) {
 				return plugin;
 			})(),
 			{
-				...sky('es2015'),
+				...vue(),
 				enforce: "pre"
 			},
-			{
-				...vue(),
-			enforce: "pre"
-		},
-		typescript(),
-		(function() {
+			typescript(),
+			(function() {
 				let plugin = vueJsx({
 					tsTransform: 'built-in',
 					include: /\.(j|t)sx$/

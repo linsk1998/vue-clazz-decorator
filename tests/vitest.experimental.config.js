@@ -21,6 +21,10 @@ module.exports = defineConfig(function({ command, mode }) {
 		},
 		esbuild: false,
 		plugins: [
+			{
+				...sky('es2015'),
+				enforce: "pre"
+			},
 			(function() {
 				let plugin = nodeResolve({
 					browser: true
@@ -30,51 +34,47 @@ module.exports = defineConfig(function({ command, mode }) {
 				return plugin;
 			})(),
 			{
-				...sky('es2015'),
-				enforce: "pre"
-			},
-			{
 				...vue({
-				devServer: {
-					config: {
-						oxc: {
-							decorators: {
-								legacy: true,
-								emitMetadata: true
+					devServer: {
+						config: {
+							oxc: {
+								decorators: {
+									legacy: true,
+									emitMetadata: true
+								},
+								assumptions: {
+									setPublicClassFields: true
+								},
+								typescript: {
+									removeClassFieldsWithoutInitializer: true
+								},
 							},
-							assumptions: {
-								setPublicClassFields: true
-							},
-							typescript: {
-								removeClassFieldsWithoutInitializer: true
-							},
-						},
-						esbuild: {
-							tsconfigRaw: JSON.stringify({
-								compilerOptions: {
-									experimentalDecorators: true,
-									useDefineForClassFields: false,
-									emitDecoratorMetadata: false,
-								}
-							})
+							esbuild: {
+								tsconfigRaw: JSON.stringify({
+									compilerOptions: {
+										experimentalDecorators: true,
+										useDefineForClassFields: false,
+										emitDecoratorMetadata: false,
+									}
+								})
+							}
 						}
 					}
-				}
-			}),
-			enforce: "pre"
-		},
-		typescript({
-			compilerOptions: {
-				experimentalDecorators: true,
-				useDefineForClassFields: false,
+				}),
+				enforce: "pre"
 			},
-			transformers: (program) => ({
-				before: [
-					require("typescript-plugin-mark-fields")(program, {})
-				]
-			})
-		}),
-		(function() {
+			typescript({
+				compilerOptions: {
+					experimentalDecorators: true,
+					useDefineForClassFields: false,
+				},
+				transformers: (program) => ({
+					before: [
+						require("typescript-plugin-mark-fields")(program, {})
+					]
+				})
+			}),
+			(function() {
 				let plugin = vueJsx({
 					tsTransform: 'built-in',
 					include: /\.(j|t)sx$/

@@ -26,6 +26,10 @@ module.exports = defineConfig(function({ command, mode }) {
 		},
 		esbuild: false,
 		plugins: [
+			{
+				...sky('es2015'),
+				enforce: "pre"
+			},
 			(function() {
 				let plugin = nodeResolve({
 					browser: true
@@ -34,10 +38,6 @@ module.exports = defineConfig(function({ command, mode }) {
 				plugin.enforce = "pre";
 				return plugin;
 			})(),
-			{
-				...sky('es2015'),
-				enforce: "pre"
-			},
 			{
 				...vue({
 					devServer: {

@@ -4,7 +4,7 @@
 
 ---
 
-## emitDecoratorMetadata 类型元数据
+## 如何配置 emitDecoratorMetadata 类型元数据
 
 TypeScript 开启 `emitDecoratorMetadata` 后，编译器会自动给**有装饰器的字段、方法、构造器参数**标注 `design:type`、`design:paramtypes`、`design:returntype` 三种元数据。
 
@@ -86,9 +86,17 @@ class User {
 
 ---
 
-## reflect-metadata 代码迁移
+## 全局函数注入
 
-通过 `@rollup/plugin-inject` 将 `Reflect.metadata` / `Reflect.getMetadata` 的调用自动重定向到本库，无需修改业务代码。
+启用了 `emitDecoratorMetadata` 后，一些装饰器会编译成全局函数调用，如 Reflect.metadata。通常情况下我们要污染全变量来注册。
+
+```javascript
+import { metadata } from "vue-clazz-decorator";
+// BAD
+Reflect.metadata = metadata;
+```
+
+但是，我更推荐用 `@rollup/plugin-inject` 以不污染全局变量的方式，将 `Reflect.metadata` / `Reflect.getMetadata` 的调用自动重定向到本库，无需修改业务代码。还能避免和别的库产生冲突。
 
 ```javascript
 const inject = require("@rollup/plugin-inject");
@@ -99,7 +107,8 @@ module.exports = {
             modules: {
                 'Reflect.metadata': ["vue-clazz-decorator", 'metadata'],
                 'Reflect.getMetadata': ["vue-clazz-decorator", 'getMetadata'],
-            }
+            },
+            include: '这里可以设定生效一个范围',
         })
     ]
 };
@@ -135,6 +144,10 @@ getMetadata('design:type', target, 'name');
 之后 IDE 即可识别 `Reflect.metadata`、`Reflect.getMetadata`、`Reflect.defineMetadata` 等全局方法。
 
 ---
+
+## 如何配置 useDefineForClassFields: false
+
+如果开启 `useDefineForClassFields: false`，这会消除字段定义，导致运行时无法知道这个类有哪些字段。为了在配置 `useDefineForClassFields: false` 后起作用，你需要引入 `babel-plugin-mark-fields` 或 `babel-plugin-mark-fields`。这2个插件会在构建时，提前知道字段名，并做记号，后续运行时代码就可以知道一个类有哪些字段了。
 
 ## reactive / normalize / hydrate 选择指南
 
