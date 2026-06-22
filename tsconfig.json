@@ -10,7 +10,6 @@
 		"esModuleInterop": false,
 		"resolveJsonModule": true,
 		"isolatedModules": true,
-		"importHelpers": true,
 		"jsx": "preserve",
 		"jsxImportSource": "vue",
 		"experimentalDecorators": false,

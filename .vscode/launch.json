@@ -9,8 +9,9 @@
 				"${workspaceFolder}/node_modules/vitest/vitest.mjs",
 				"${file}",
 				"-c",
-				"tests/vitest.babel-proposal.config.js",
+				"tests/vitest.config.js",
 				"--watch=false",
+				"--mode=babel",
 				"--test-timeout=0"
 			],
 			"cwd": "${workspaceFolder}",
@@ -27,8 +28,9 @@
 				"${workspaceFolder}/node_modules/vitest/vitest.mjs",
 				"${file}",
 				"-c",
-				"tests/vitest.babel-experimental.config.js",
+				"tests/vitest.experimental.config.js",
 				"--watch=false",
+				"--mode=babel",
 				"--test-timeout=0"
 			],
 			"cwd": "${workspaceFolder}",
@@ -45,8 +47,9 @@
 				"${workspaceFolder}/node_modules/vitest/vitest.mjs",
 				"${file}",
 				"-c",
-				"tests/vitest.metadata-babel-experimental.config.js",
+				"tests/vitest.metadata-experimental.config.js",
 				"--watch=false",
+				"--mode=babel",
 				"--test-timeout=0"
 			],
 			"cwd": "${workspaceFolder}",

@@ -1,6 +1,5 @@
 const { nodeResolve } = require("@rollup/plugin-node-resolve");
 const inject = require("@rollup/plugin-inject");
-const typescript = require("@rollup/plugin-typescript");
 const vue = require("@vitejs/plugin-vue");
 const vueJsx = require("@vitejs/plugin-vue-jsx");
 const path = require("path");
@@ -8,6 +7,15 @@ const { defineConfig } = require('vite');
 const sky = require('../node_modules/sky-core/createRollupPlugin');
 
 module.exports = defineConfig(function({ command, mode }) {
+	var transformer;
+		switch(mode) {
+		case "babel":
+			transformer = require("./babel");
+			break;
+		default:
+			transformer = require("./typescript");
+			break;
+	}
 
 	return {
 		resolve: {
@@ -63,18 +71,9 @@ module.exports = defineConfig(function({ command, mode }) {
 				}),
 				enforce: "pre"
 			},
-			typescript({
-				compilerOptions: {
-					experimentalDecorators: true,
-					emitDecoratorMetadata: true,
-					useDefineForClassFields: false,
-					importHelpers: true,
-				},
-				transformers: (program) => ({
-					before: [
-						require("typescript-plugin-mark-fields")(program, {})
-					]
-				})
+			transformer({
+				experimentalDecorators: true,
+				emitDecoratorMetadata: true,
 			}),
 			(function() {
 				let plugin = vueJsx({
@@ -101,9 +100,6 @@ module.exports = defineConfig(function({ command, mode }) {
 		test: {
 			environment: 'jsdom',
 			globals: true,
-			transformMode: {
-				web: [/\.[jt]sx$/],
-			},
 			include: ['tests/type-metadata/**/*.test.{ts,tsx}'],
 			exclude: ['**/node_modules/**'],
 			server: {

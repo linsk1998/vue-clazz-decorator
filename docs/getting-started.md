@@ -91,12 +91,9 @@ TypeScript 长期支持的传统装饰器，生态成熟，支持类型注入和
 ```
 
 完整编译示例：
- + [typescript](https://github.com/linsk1998/vue-clazz-decorator/tree/main/tests/vitest.proposal.config.js)
- + [babel](https://github.com/linsk1998/vue-clazz-decorator/tree/main/tests/vitest.babel-proposal.config.js)
- + [typescript + experimental + 字段set语义](https://github.com/linsk1998/vue-clazz-decorator/tree/main/tests/vitest.experimental.config.js)
- + [babel + experimental + 字段set语义](https://github.com/linsk1998/vue-clazz-decorator/tree/main/tests/vitest.babel-experimental.config.js)
- + [typescript + experimental + 字段set语义 + emitDecoratorMetadata](https://github.com/linsk1998/vue-clazz-decorator/tree/main/tests/vitest.metadata-experimental.config.js)
- + [babel + experimental + 字段set语义 + emitDecoratorMetadata](https://github.com/linsk1998/vue-clazz-decorator/tree/main/tests/vitest.metadata-babel-experimental.config.js)
+ + [推荐配置](https://github.com/linsk1998/vue-clazz-decorator/tree/main/tests/vitest.config.js)
+ + [experimental](https://github.com/linsk1998/vue-clazz-decorator/tree/main/tests/vitest.babel-experimental.config.js)
+ + [experimental + emitDecoratorMetadata](https://github.com/linsk1998/vue-clazz-decorator/tree/main/tests/vitest.metadata-babel-experimental.config.js)
 
 ---
 
