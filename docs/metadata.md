@@ -20,8 +20,49 @@ class MyClass {
 getMetadata('myKey', MyClass, 'field'); // => 'myValue'
 ```
 
-兼容类装饰器、字段装饰器、方法装饰器，同时支持 Legacy 和 TC39 标准。
+### 自定义装饰器
 
+利用 `metadata()` 装饰器工厂，可以轻松创建自定义装饰器：
+
+```tsx
+import { metadata, getFieldMetadataValues, ViewModel, State, createComponent } from 'vue-clazz-decorator';
+
+// 创建自定义装饰器
+const Label = (text: string) => metadata('label', text);
+const Required = metadata('required', true);
+const Readonly = metadata('readonly', true);
+
+@ViewModel
+class FormViewModel {
+    @Label('用户名')
+    @Required
+    @State
+    public username = '';
+
+    @Label('备注')
+    @Readonly
+    @State
+    public remark = '';
+}
+
+// 运行时读取元数据，生成表单
+function FormView(props: FormViewModel) {
+    const meta = getFieldMetadataValues(FormViewModel);
+    return <form>
+        {Object.entries(meta).map(([key, config]) => (
+            <div key={key}>
+                <label>{config.label}</label>
+                <input
+                    value={props[key]}
+                    onInput={(e) => { props[key] = e.target.value; }}
+                    required={!!config.required}
+                    readOnly={!!config.readonly}
+                />
+            </div>
+        ))}
+    </form>;
+}
+```
 ---
 
 ## defineMetadata
