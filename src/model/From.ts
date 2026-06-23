@@ -1,11 +1,9 @@
 import { ensureMetadata } from "@/ensureMetadata";
 import { fieldWeakMap } from "@/metadata/defineFieldMetadata";
-import type { EsAccessorDecorator, EsFieldDecorator, EsGetterDecorator, EsSetterDecorator, LegacyPropertyDecorator } from "../decorator/types";
-
-type FieldDecorator<This extends object = any, Value = any> = EsFieldDecorator<This, Value> & EsAccessorDecorator<This, Value> & EsGetterDecorator<This, Value> & EsSetterDecorator<This, Value> & LegacyPropertyDecorator<This>;
+import type { AutoPropertyDecorator } from "../decorator/types";
 
 /** 引用另一个 Model 的某个字段的元数据配置 */
-export function From<This extends object = any, Value = any>(SourceClass: Function, sourceField: string): FieldDecorator<This, Value> {
+export function From<This extends object = any, Value = any>(SourceClass: Function, sourceField: string): AutoPropertyDecorator<This, Value> {
 	return function(target: any, context: any) {
 		var property: string, metadata: object;
 		if(typeof context === "string") {

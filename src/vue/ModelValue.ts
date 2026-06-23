@@ -1,8 +1,8 @@
-import type { EsAccessorDecorator, EsFieldDecorator, LegacyPropertyDecorator } from "@/decorator/types";
 import { metadata } from "@/metadata/metadata";
+import type { AutoPropertyDecorator } from "../decorator/types";
 
-type ModelValueDecorator<This extends object, Value> = EsFieldDecorator<This, Value> & EsAccessorDecorator<This, Value> & LegacyPropertyDecorator<This> & (
-	(key: string) => (EsFieldDecorator<This, Value> & EsAccessorDecorator<This, Value> & LegacyPropertyDecorator<This>)
+type ModelValueDecorator<This extends object, Value> = AutoPropertyDecorator<This, Value> & (
+	(key: string) => AutoPropertyDecorator<This, Value>
 );
 
 

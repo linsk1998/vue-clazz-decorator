@@ -253,7 +253,7 @@ describe('watch', () => {
 			@State
 			b = 2;
 
-			@Watch((inst: WatchViewModel) => inst.a + inst.b)
+			@Watch((inst) => inst.a + inst.b)
 			protected onSumChange(newValue: number, oldValue: number) {
 				changed = `new:${newValue}, old:${oldValue}`;
 			}

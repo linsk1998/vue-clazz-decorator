@@ -1,5 +1,5 @@
-import type { EsMethodDecorator, LegacyMethodDecorator } from "@/decorator/types";
 import { metadata } from "@/metadata/metadata";
+import type { AutoMethodDecorator } from "../decorator/types";
 
 interface WatchOptions {
 	deep?: boolean;
@@ -8,7 +8,7 @@ interface WatchOptions {
 
 type WatchSource<This extends object, Value> = (this: This, instance: This) => Value;
 type WatchCallback<Value> = (newValue: Value, oldValue: Value) => any;
-type WatchDecorator<This extends object, Value extends WatchCallback<any>> = EsMethodDecorator<This, Value> & LegacyMethodDecorator<This>;
+type WatchDecorator<This extends object, Value extends WatchCallback<any>> = AutoMethodDecorator<This, Value>;
 
 function Watch<This extends object, Value>(source: string, options?: WatchOptions): WatchDecorator<This, WatchCallback<Value>>;
 function Watch<This extends object, Value>(source: WatchSource<This, any>, options?: WatchOptions): WatchDecorator<This, WatchCallback<Value>>;

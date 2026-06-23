@@ -1,10 +1,10 @@
-import type { EsGetterDecorator, EsSetterDecorator, LegacyAccessorDecorator } from "@/decorator/types";
 import { ensureMetadata } from "@/ensureMetadata";
 import { defineFieldMetadata } from "@/metadata/defineFieldMetadata";
 import { computed as $computed } from "vue";
+import type { AutoAccessorDecorator } from "../decorator/types";
 
 
-type ComputedDecorator<This extends object, Value> = EsGetterDecorator<This, Value> & EsSetterDecorator<This, Value> & LegacyAccessorDecorator<This>;
+type ComputedDecorator<This extends object, Value> = AutoAccessorDecorator<This, Value>;
 
 const Computed: ComputedDecorator<object, any> = function(target: any, context?: any) {
 	const metadataKey = 'computed';
@@ -41,3 +41,4 @@ function computed<T>(getter: () => T, setter?: (value: T) => void) {
 	}
 }
 export { computed };
+

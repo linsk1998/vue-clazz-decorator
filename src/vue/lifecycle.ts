@@ -1,9 +1,8 @@
-import type { EsMethodDecorator, LegacyMethodDecorator } from "@/decorator/types";
 import { metadata } from "@/metadata/metadata";
+import type { AutoMethodDecorator } from "../decorator/types";
 
 type LifecycleDecorator<This extends object, Value extends ((...args: any[]) => any) = (...args: any[]) => any> =
-	EsMethodDecorator<This, Value> &
-	LegacyMethodDecorator<This>;
+	AutoMethodDecorator<This, Value>;
 
 /** ViewModel已经创建了实例 */
 export const OnDidCreate: LifecycleDecorator<any> = metadata('onDidCreate', true);

@@ -1,13 +1,13 @@
-import { EsAccessorDecorator, EsFieldDecorator, LegacyPropertyDecorator } from "@/decorator/types";
 import { ensureMetadata } from "@/ensureMetadata";
 import { defineFieldMetadata } from "@/metadata/defineFieldMetadata";
 import { metadata } from "@/metadata/metadata";
+import type { AutoPropertyDecorator } from "../decorator/types";
 
-interface ClassWithInitializer<T> {
+export interface ModelClassWithInitializer<T> {
 	new(init?: Record<keyof T, any>): T;
 }
 
-type ReactiveDecorator<This extends object, Value> = EsFieldDecorator<This, Value> & EsAccessorDecorator<This, Value> & LegacyPropertyDecorator<This> & ((type: ClassWithInitializer<Value>) => EsFieldDecorator<This, Value> & EsAccessorDecorator<This, Value> & LegacyPropertyDecorator<This>);
+type ReactiveDecorator<This extends object, Value> = AutoPropertyDecorator<This, Value> & ((type: ModelClassWithInitializer<Value>) => AutoPropertyDecorator<This, Value>);
 
 
 const decorator = metadata('reactive', null);

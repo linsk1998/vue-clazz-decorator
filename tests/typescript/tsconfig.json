@@ -1,0 +1,19 @@
+{
+	"compilerOptions": {
+		"target": "es2024",
+		"lib": [
+			"DOM",
+			"ESNext"
+		],
+		"module": "ESNext",
+		"moduleResolution": "node",
+		"experimentalDecorators": true,
+		"useDefineForClassFields": false,
+		"strict": true,
+		"noEmit": true,
+		"skipLibCheck": true
+	},
+	"include": [
+		"./**/*.ts"
+	]
+}

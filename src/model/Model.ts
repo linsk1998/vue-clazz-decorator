@@ -3,15 +3,13 @@ import { defineFieldMetadata } from "@/metadata/defineFieldMetadata";
 import { getFieldMetadataValues } from "@/metadata/getFieldMetadataValues";
 import { ACCESSOR_MAP } from "@/vue/ACCESSOR_MAP";
 import { DEFAULT_MAP } from "@/vue/DEFAULT_MAP";
+import type { ModelClassWithInitializer } from "@/vue/Reactive";
 import { ensureMetadata } from "../ensureMetadata";
 import { applyOnionSerialize } from "./serialize";
 
-interface ClassWithInitializer<T> {
-	new(init?: Record<keyof T, any>): T;
-}
 
 /** 模型层 */
-export function Model<T extends object>(Class: ClassWithInitializer<T>, context?: ClassDecoratorContext<ClassWithInitializer<T>>): ClassWithInitializer<T> {
+export function Model<T extends object>(Class: ModelClassWithInitializer<T>, context?: ClassDecoratorContext<ModelClassWithInitializer<T>>): ModelClassWithInitializer<T> {
 	if(context) {
 		Class[Symbol.metadata] = context.metadata;
 		defineClassMetadata('model', true, context.metadata);

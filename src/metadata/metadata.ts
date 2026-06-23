@@ -1,11 +1,10 @@
-import type { EsAccessorDecorator, EsClassDecorator, EsFieldDecorator, EsGetterDecorator, EsMethodDecorator, EsSetterDecorator, LegacyClassDecorator, LegacyMethodDecorator, LegacyPropertyDecorator } from "@/decorator/types";
+import type { AutoAccessorDecorator, AutoClassDecorator, AutoMethodDecorator, AutoPropertyDecorator } from "../decorator/types";
 import { ensureMetadata } from "../ensureMetadata";
 import { defineClassMetadata } from "./defineClassMetadata";
 import { defineFieldMetadata } from "./defineFieldMetadata";
 
 
-export function metadata<This extends object, Value = any>(metadataKey: string, metadataValue: any): EsFieldDecorator<This, Value> & EsAccessorDecorator<This, Value> & EsGetterDecorator<This, Value> & EsSetterDecorator<This, Value> & EsMethodDecorator<This, any> & EsClassDecorator<This> &
-	LegacyMethodDecorator<This> & LegacyPropertyDecorator<This> & LegacyClassDecorator {
+export function metadata<This extends object, Value = any>(metadataKey: string, metadataValue: any): AutoPropertyDecorator<This, Value> & AutoAccessorDecorator<This, Value> & AutoMethodDecorator<This, any> & AutoClassDecorator<This> {
 	return function(target: any, context?: any) {
 		if(context) {
 			if(typeof context === "string") {
@@ -24,5 +23,3 @@ export function metadata<This extends object, Value = any>(metadataKey: string, 
 		}
 	};
 }
-
-export const __metadata = metadata;

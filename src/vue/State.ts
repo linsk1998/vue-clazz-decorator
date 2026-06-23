@@ -1,8 +1,8 @@
-import { EsAccessorDecorator, EsFieldDecorator, LegacyPropertyDecorator } from "@/decorator/types";
 import { metadata } from "@/metadata/metadata";
 import { ref } from "vue";
+import type { AutoPropertyDecorator } from "../decorator/types";
 
-type StateDecorator<This extends object, Value> = EsFieldDecorator<This, Value> & EsAccessorDecorator<This, Value> & LegacyPropertyDecorator<This>;
+type StateDecorator<This extends object, Value> = AutoPropertyDecorator<This, Value>;
 
 export const State: StateDecorator<object, any> = metadata('state', true);
 

@@ -7,6 +7,7 @@
 	"types": "types/index.d.ts",
 	"exports": {
 		".": {
+			"types": "./types/index.d.ts",
 			"import": "./dist/index.mjs",
 			"require": "./dist/index.cjs"
 		}
@@ -44,16 +45,17 @@
 	},
 	"scripts": {
 		"build": "rollup -c",
-		"types": "tsc -p tsconfig.types.json",
-		"test": "npm run test:proposal && npm run test:proposal:babel && npm run test:experimental && npm run test:experimental:babel && npm run test:metadata && npm run test:metadata:babel",
+		"types": "dts-bundle-generator src/index.ts -o types/index.d.ts --no-check --project tsconfig.json --external-imports vue",
+		"test": "npm run test:proposal && npm run test:proposal:babel && npm run test:experimental && npm run test:experimental:babel && npm run test:metadata && npm run test:metadata:babel && npm run test:typescript",
 		"test:proposal": "vitest -c tests/vitest.config.js --watch=false",
 		"test:proposal:babel": "vitest -c tests/vitest.config.js --mode babel --watch=false",
 		"test:experimental": "vitest -c tests/vitest.experimental.config.js --watch=false",
 		"test:experimental:babel": "vitest -c tests/vitest.experimental.config.js --mode babel --watch=false",
 		"test:metadata": "vitest -c tests/vitest.metadata-experimental.config.js --watch=false",
 		"test:metadata:babel": "vitest -c tests/vitest.metadata-experimental.config.js --mode babel --watch=false",
+		"test:typescript": "tsc --noEmit -p tests/typescript/tsconfig.json",
 		"prepublishOnly": "npm run clean && npm run build && npm run types && npm test",
-		"clean": "npx rimraf dist types"
+		"clean": "npx rimraf dist"
 	},
 	"dependencies": {
 		"@babel/runtime": "^7.26.7",
@@ -73,6 +75,7 @@
 		"@rollup/plugin-inject": "^5.0.5",
 		"@rollup/plugin-node-resolve": "^16.0.3",
 		"@rollup/plugin-typescript": "^12.1.2",
+		"@types/node": "^26.0.0",
 		"@vitejs/plugin-vue": "^5.2.1",
 		"@vitejs/plugin-vue-jsx": "^5.1.5",
 		"@vitest/ui": "3.0.4",
@@ -81,6 +84,7 @@
 		"babel-plugin-mark-fields": "^1.0.0",
 		"babel-plugin-transform-typescript-decorators": "^0.3.0",
 		"babel-plugin-transform-typescript-metadata": "^0.4.0",
+		"dts-bundle-generator": "^9.5.1",
 		"jsdom": "^26.0.0",
 		"rollup": "3.0.0",
 		"sky-core": "^0.24.0",

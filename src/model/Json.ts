@@ -1,22 +1,20 @@
 import { metadata } from "@/metadata/metadata";
 import SimpleDateFormat from "java.text.simple-date-format";
-import type { EsAccessorDecorator, EsFieldDecorator, EsGetterDecorator, EsSetterDecorator, LegacyAccessorDecorator, LegacyPropertyDecorator } from "../decorator/types";
+import type { AutoPropertyDecorator } from "../decorator/types";
 import { ensureMetadata } from "../ensureMetadata";
 import { defineFieldMetadata, fieldWeakMap } from "../metadata/defineFieldMetadata";
 
 export type NextFunction = (value: any) => any;
 export type NextHandleFunction = (value: any, config: any, next: NextFunction) => any;
 
-type FieldDecorator<This extends object = any, Value = any> = EsFieldDecorator<This, Value> & EsAccessorDecorator<This, Value> & EsGetterDecorator<This, Value> & EsSetterDecorator<This, Value> & LegacyPropertyDecorator<This> & LegacyAccessorDecorator<This>;
-
 /** 指定 JSON 序列化时的键名 */
-export function JsonProperty(jsonKey: string): FieldDecorator<any, any> {
+export function JsonProperty(jsonKey: string): AutoPropertyDecorator<any, any> {
 	return metadata('property', jsonKey);
 }
 
 /** 控制序列化方向 */
-function JsonExpose<This extends object = any, Value = any>(serialize: boolean, deserialize?: boolean): FieldDecorator<This, Value>;
-function JsonExpose<This extends object = any, Value = any>(options?: { serialize?: boolean; deserialize?: boolean; }): FieldDecorator<This, Value>;
+function JsonExpose<This extends object = any, Value = any>(serialize: boolean, deserialize?: boolean): AutoPropertyDecorator<This, Value>;
+function JsonExpose<This extends object = any, Value = any>(options?: { serialize?: boolean; deserialize?: boolean; }): AutoPropertyDecorator<This, Value>;
 function JsonExpose<This extends object = any, Value = any>(options?: any): any {
 	if(typeof options === "object") {
 		if(options) {
@@ -33,7 +31,7 @@ function JsonExpose<This extends object = any, Value = any>(options?: any): any 
 export { JsonExpose };
 
 /** 忽略属性，序列化和反序列化时都忽略 */
-export const JsonIgnore: FieldDecorator<any, any> = metadata('expose', { serialize: false, deserialize: false });
+export const JsonIgnore: AutoPropertyDecorator<any, any> = metadata('expose', { serialize: false, deserialize: false });
 
 function getOwnMetadata(metadataKey: string | symbol, metadata: any, name: string) {
 	var fieldMetadata = fieldWeakMap.get(metadata);
@@ -46,7 +44,7 @@ function getOwnMetadata(metadataKey: string | symbol, metadata: any, name: strin
 }
 
 /** 自定义序列化逻辑，多个函数采用洋葱模型叠加执行 */
-export function JsonSerialize<This extends object, Value>(fn: NextHandleFunction): FieldDecorator<This, Value> {
+export function JsonSerialize<This extends object, Value>(fn: NextHandleFunction): AutoPropertyDecorator<This, Value> {
 	return function(target: any, context: any) {
 		var property, metadata;
 		if(typeof context === "string") {
@@ -66,7 +64,7 @@ export function JsonSerialize<This extends object, Value>(fn: NextHandleFunction
 }
 
 /** 自定义反序列化逻辑，多个函数采用洋葱模型叠加执行 */
-export function JsonDeserialize<This extends object, Value>(fn: NextHandleFunction): FieldDecorator<This, Value> {
+export function JsonDeserialize<This extends object, Value>(fn: NextHandleFunction): AutoPropertyDecorator<This, Value> {
 	return function(target: any, context: any) {
 		var property, metadata;
 		if(typeof context === "string") {
@@ -98,11 +96,11 @@ function unshiftTimezone(date: Date, hours: number): Date {
 }
 
 /** 日期格式化与解析，自动注册序列化与反序列化钩子 */
-export function JsonFormat<This extends object = any>(shape: NumberConstructor): FieldDecorator<This, Date>;
-export function JsonFormat<This extends object = any>(pattern: string, timezone?: number): FieldDecorator<This, Date>;
-export function JsonFormat<This extends object = any>(options: { pattern: string; timezone?: number; }): FieldDecorator<This, Date>;
-export function JsonFormat<This extends object = any>(options: { shape: NumberConstructor; }): FieldDecorator<This, Date>;
-export function JsonFormat<This extends object = any>(pattern: string | NumberConstructor | { pattern?: string; timezone?: number; shape?: NumberConstructor; }, timezone?: number): FieldDecorator<This, Date> {
+export function JsonFormat<This extends object = any>(shape: NumberConstructor): AutoPropertyDecorator<This, Date>;
+export function JsonFormat<This extends object = any>(pattern: string, timezone?: number): AutoPropertyDecorator<This, Date>;
+export function JsonFormat<This extends object = any>(options: { pattern: string; timezone?: number; }): AutoPropertyDecorator<This, Date>;
+export function JsonFormat<This extends object = any>(options: { shape: NumberConstructor; }): AutoPropertyDecorator<This, Date>;
+export function JsonFormat<This extends object = any>(pattern: string | NumberConstructor | { pattern?: string; timezone?: number; shape?: NumberConstructor; }, timezone?: number): AutoPropertyDecorator<This, Date> {
 	var _pattern: string;
 	var _timezone: number | undefined;
 	var _isTimestamp: boolean;

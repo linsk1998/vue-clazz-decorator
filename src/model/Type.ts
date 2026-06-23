@@ -1,9 +1,7 @@
 import { metadata } from "@/metadata/metadata";
-interface ClassWithInitializer<T> {
-	new(init?: Record<keyof T, any>): T;
-}
+import type { ModelClassWithInitializer } from "@/vue/Reactive";
 
 
-export function Type<T>(type: ClassWithInitializer<T>) {
+export function Type<T>(type: ModelClassWithInitializer<T>) {
 	return metadata<any, T>('type', type);
 }

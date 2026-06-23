@@ -49,46 +49,7 @@ pnpm add vue-clazz-decorator
 
 ## 选择装饰器编译方式
 
-`vue-clazz-decorator` 支持多种装饰器编译方式，**功能完全一致，选一个适合你的即可**。
-
-### A) TypeScript Proposal 装饰器
-
-TypeScript 5.4+ 支持 TC39 Proposal语法，类型推断完善。在 `tsconfig.json` 中配置：
-
-```json
-{
-  "compilerOptions": {
-    "experimentalDecorators": false,
-    "useDefineForClassFields": true
-  }
-}
-```
-
-### B) TypeScript Experimental Decorators
-
-TypeScript 长期支持的传统装饰器，生态成熟，支持类型注入和参数装饰器。在 `tsconfig.json` 中配置：
-
-```json
-{
-  "compilerOptions": {
-    "experimentalDecorators": true,
-    "useDefineForClassFields": false
-  }
-}
-```
-
-### C) Babel Proposal Decorators
-
-需要 Babel 插件 ` @babel/plugin-proposal-decorators`:
-
-```json
-{
-  "plugins": [
-    ["@babel/plugin-proposal-decorators", { "version": "2023-11" }],
-    ["@babel/plugin-proposal-class-properties", { "loose": false }]
-  ]
-}
-```
+`vue-clazz-decorator` 支持多种装饰器编译方式，一般就用typescript默认配置即可。需要特殊配置的，可以参考[高级用法](./advanced.md)
 
 完整编译示例：
  + [推荐配置](https://github.com/linsk1998/vue-clazz-decorator/tree/main/tests/vitest.config.js)
