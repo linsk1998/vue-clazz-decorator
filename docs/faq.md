@@ -24,6 +24,17 @@
 
 本库的核心模式是 JSX/TSX 视图函数 + ViewModel 类，不依赖 `.vue` SFC 文件。但你可以在同一项目中混用 SFC 和 `createComponent` 创建的组件。
 
+```ts
+import Template from './template.vue';
+
+@ViewModel
+class AppViewModel {
+    @State
+    title = 'Hello';
+}
+const App = createComponent(Template, AppViewModel);
+```
+
 ---
 
 ## 使用问题
