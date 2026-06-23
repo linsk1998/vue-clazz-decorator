@@ -225,6 +225,8 @@ class MyClass {
 
 序列化时 `Date` 转为格式化的日期字符串，反序列化时将符合格式的字符串解析为 `Date`。不匹配格式的字符串解析后为无效 `Date`。
 
+> 这里的 pattern 是 [SimpleDateFormat](https://www.npmjs.com/package/java.text.simple-date-format) 的格式。如果没有使用 JsonFormat 不会额外引入日期解析库。
+
 ### 时间戳模式
 
 ```typescript

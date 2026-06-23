@@ -29,6 +29,7 @@ export * from "./vue/lifecycle";
 export * from "./vue/Prop";
 export * from "./vue/Provide";
 export * from "./vue/Ref";
+export * from "./vue/signals";
 export * from "./vue/State";
 export * from "./vue/use";
 export * from "./vue/useChildren";
