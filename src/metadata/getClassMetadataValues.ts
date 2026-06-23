@@ -1,5 +1,13 @@
 import { classWeakMap } from "./defineClassMetadata";
 
+/**
+ * 获取类的所有元数据值（包含继承链）
+ *
+ * 沿原型链向上收集所有类级别的元数据，子类元数据优先（不会被父类覆盖）
+ *
+ * @param Class - 目标构造函数
+ * @returns 包含所有元数据键值的对象
+ */
 export function getClassMetadataValues(Class: Object): Record<string | symbol, any> {
 	let r = Object.create(null);
 	let Super = Class;

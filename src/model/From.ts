@@ -2,7 +2,16 @@ import { ensureMetadata } from "@/ensureMetadata";
 import { fieldWeakMap } from "@/metadata/defineFieldMetadata";
 import type { AutoPropertyDecorator } from "../decorator/types";
 
-/** 引用另一个 Model 的某个字段的元数据配置 */
+/**
+ * 引用另一个 Model 的某个字段的元数据配置
+ *
+ * 将源类的指定字段的元数据复制到当前字段上。
+ * 会沿原型链向上查找源字段的元数据配置
+ *
+ * @param SourceClass - 源 Model 类
+ * @param sourceField - 源字段名称
+ * @returns 属性装饰器
+ */
 export function From<This extends object = any, Value = any>(SourceClass: Function, sourceField: string): AutoPropertyDecorator<This, Value> {
 	return function(target: any, context: any) {
 		var property: string, metadata: object;

@@ -29,6 +29,14 @@ const LIFECYCLE_HOOKS: Record<string, Function> = {
 	onDidCatch: onErrorCaptured,
 };
 
+/**
+ * 创建可复用业务逻辑实例
+ *
+ * @typeParam T - 组件实例类型
+ * @param Class - 组件类构造函数
+ * @returns 完整的组件实例
+ * @throws 如果在非 setup 环境中调用会抛出错误
+ */
 export function use<T extends object>(Class: { new(props?: Record<string, any>): T; }): T {
 	let vueInst = getCurrentInstance();
 	if(!vueInst) throw new Error('use must be called in when component setup');

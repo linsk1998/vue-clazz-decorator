@@ -3,6 +3,16 @@ import { ACCESSOR_MAP } from "./ACCESSOR_MAP";
 import { DEFAULT_MAP } from "./DEFAULT_MAP";
 
 
+/**
+ * ViewModel 类装饰器
+ *
+ * 将一个类声明为 ViewModel（视图模型），为其注入基于元数据配置的属性访问器。
+ *
+ * @typeParam T - ViewModel 类类型
+ * @param Class - ViewModel 类构造函数
+ * @param context - ES 新提案的类装饰器上下文（可选）
+ * @returns 增强后的 ViewModel 类
+ */
 export function ViewModel<T extends Function>(Class: T, context?: ClassDecoratorContext): T {
 	let prototype = Class.prototype;
 	if(context) Class[Symbol.metadata] = context.metadata;

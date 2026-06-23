@@ -2,6 +2,16 @@ import { getClass } from "../getClass";
 import { classWeakMap } from "./defineClassMetadata";
 import { fieldWeakMap } from "./defineFieldMetadata";
 
+/**
+ * 获取所有元数据键名（包含继承链）
+ *
+ * 根据是否传入 `name` 参数来获取类级别或字段级别的所有元数据键名。
+ * 沿原型链向上收集，去重
+ *
+ * @param Class - 目标类或实例
+ * @param name - 可选，字段名称
+ * @returns 元数据键名数组
+ */
 export function getMetadataKeys(Class: Object, name?: string): Array<string | symbol> {
 	if(name) {
 		Class = getClass(Class);

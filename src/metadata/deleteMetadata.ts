@@ -2,6 +2,17 @@ import { getClass } from "../getClass";
 import { classWeakMap } from "./defineClassMetadata";
 import { fieldWeakMap } from "./defineFieldMetadata";
 
+/**
+ * 删除类级别或字段级别的元数据
+ *
+ * 根据是否传入 `name` 参数决定删除类级别还是字段级别的元数据。
+ * 仅删除自身（own）的元数据键，不会删除继承的元数据
+ *
+ * @param metadataKey - 元数据键名
+ * @param Class - 目标类或实例
+ * @param name - 可选，字段名称
+ * @returns 是否成功删除
+ */
 export function deleteMetadata(metadataKey: string | symbol, Class: Object, name?: string) {
 	if(name) {
 		Class = getClass(Class);

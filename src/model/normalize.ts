@@ -3,7 +3,17 @@ import { getFieldMetadataValues } from "@/metadata/getFieldMetadataValues";
 import { getOwnMetadata } from "@/metadata/getOwnMetadata";
 import { applyOnionDeserialize } from "./deserialize";
 
-
+/**
+ * 规范化函数：将原始对象轻量转换为符合 Model 类型约束的普通对象
+ *
+ * 与 `hydrate` 类似，但返回的是普通对象而非 Model 类实例，不会创建响应式状态。
+ * 适用于只需要类型转换而不需要响应式能力的场景
+ *
+ * @typeParam T - 目标类型
+ * @param o - 原始数据对象或数组
+ * @param Class - 目标类的构造函数
+ * @returns 规范化后的普通对象
+ */
 function normalize<T>(o: T[], Class: ArrayConstructor): T[];
 function normalize<T>(o: any, Class: { new(): T; }): T;
 function normalize(o: any, Class: any): any {

@@ -1,5 +1,14 @@
 import { fieldWeakMap } from "./defineFieldMetadata";
 
+/**
+ * 获取指定字段的元数据值（包含继承链）
+ *
+ * 沿原型链向上查找指定字段的元数据，子类中的元数据优先
+ *
+ * @param Class - 目标构造函数
+ * @param key - 字段名称
+ * @returns 包含该字段所有元数据键值的对象
+ */
 export function getFieldMetadataValue(Class: Function, key: string) {
 	let rField = {};
 	let Super = Class;

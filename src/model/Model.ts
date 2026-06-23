@@ -8,7 +8,17 @@ import { ensureMetadata } from "../ensureMetadata";
 import { applyOnionSerialize } from "./serialize";
 
 
-/** 模型层 */
+/**
+ * 模型类装饰器
+ *
+ * 标记一个类为数据模型，为其注入属性访问器（基于元数据配置的 getter/setter）、
+ * `toJSON()` 序列化方法等能力。支持 `@Type`、`@Computed`、`@State` 等字段装饰器配合使用。
+ * 同时支持旧版（Legacy）和 ES 新提案装饰器调用方式
+ *
+ * @param Class - 目标模型类
+ * @param context - ES 新提案的类装饰器上下文（可选，Legacy 模式下不存在）
+ * @returns 增强后的模型类
+ */
 export function Model<T extends object>(Class: ModelClassWithInitializer<T>, context?: ClassDecoratorContext<ModelClassWithInitializer<T>>): ModelClassWithInitializer<T> {
 	if(context) {
 		Class[Symbol.metadata] = context.metadata;

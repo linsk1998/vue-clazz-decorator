@@ -4,15 +4,44 @@ import type { AutoPropertyDecorator } from "../decorator/types";
 import { ensureMetadata } from "../ensureMetadata";
 import { defineFieldMetadata, fieldWeakMap } from "../metadata/defineFieldMetadata";
 
+/**
+ * JSON 序列化/反序列化"洋葱模型"中的下一步函数
+ *
+ * 接收当前值，返回处理后的值。通常由中间件链的最内层开始调用
+ */
 export type NextFunction = (value: any) => any;
+
+/**
+ * JSON 序列化/反序列化"洋葱模型"中的中间件函数
+ *
+ * @param value - 当前值
+ * @param config - 字段配置
+ * @param next - 调用下一个中间件的函数
+ * @returns 处理后的值
+ */
 export type NextHandleFunction = (value: any, config: any, next: NextFunction) => any;
 
-/** 指定 JSON 序列化时的键名 */
+/**
+ * 指定 JSON 序列化时的键名
+ *
+ * 将字段序列化时使用指定的键名而不是原始字段名
+ *
+ * @param jsonKey - JSON 中的键名
+ * @returns 属性装饰器
+ */
 export function JsonProperty(jsonKey: string): AutoPropertyDecorator<any, any> {
 	return metadata('property', jsonKey);
 }
 
-/** 控制序列化方向 */
+/**
+ * 控制序列化/反序列化方向
+ *
+ * 可分别控制序列化（输出）和反序列化（输入）行为
+ *
+ * @param serialize - 是否参与序列化，默认 `true`
+ * @param deserialize - 是否参与反序列化，默认与 `serialize` 相同
+ * @returns 属性装饰器
+ */
 function JsonExpose<This extends object = any, Value = any>(serialize: boolean, deserialize?: boolean): AutoPropertyDecorator<This, Value>;
 function JsonExpose<This extends object = any, Value = any>(options?: { serialize?: boolean; deserialize?: boolean; }): AutoPropertyDecorator<This, Value>;
 function JsonExpose<This extends object = any, Value = any>(options?: any): any {
@@ -30,7 +59,9 @@ function JsonExpose<This extends object = any, Value = any>(options?: any): any 
 }
 export { JsonExpose };
 
-/** 忽略属性，序列化和反序列化时都忽略 */
+/**
+ * 忽略属性，序列化和反序列化时都忽略
+ */
 export const JsonIgnore: AutoPropertyDecorator<any, any> = metadata('expose', { serialize: false, deserialize: false });
 
 function getOwnMetadata(metadataKey: string | symbol, metadata: any, name: string) {
@@ -43,7 +74,14 @@ function getOwnMetadata(metadataKey: string | symbol, metadata: any, name: strin
 	}
 }
 
-/** 自定义序列化逻辑，多个函数采用洋葱模型叠加执行 */
+/**
+ * 自定义序列化逻辑，多个函数采用洋葱模型叠加执行
+ *
+ * 注册一个序列化中间件函数到字段的序列化链中
+ *
+ * @param fn - 序列化中间件函数
+ * @returns 属性装饰器
+ */
 export function JsonSerialize<This extends object, Value>(fn: NextHandleFunction): AutoPropertyDecorator<This, Value> {
 	return function(target: any, context: any) {
 		var property, metadata;
@@ -63,7 +101,14 @@ export function JsonSerialize<This extends object, Value>(fn: NextHandleFunction
 	};
 }
 
-/** 自定义反序列化逻辑，多个函数采用洋葱模型叠加执行 */
+/**
+ * 自定义反序列化逻辑，多个函数采用洋葱模型叠加执行
+ *
+ * 注册一个反序列化中间件函数到字段的反序列化链中
+ *
+ * @param fn - 反序列化中间件函数
+ * @returns 属性装饰器
+ */
 export function JsonDeserialize<This extends object, Value>(fn: NextHandleFunction): AutoPropertyDecorator<This, Value> {
 	return function(target: any, context: any) {
 		var property, metadata;
@@ -95,7 +140,18 @@ function unshiftTimezone(date: Date, hours: number): Date {
 	return new Date(date.getTime() + localOffset - targetOffset);
 }
 
-/** 日期格式化与解析，自动注册序列化与反序列化钩子 */
+/**
+ * 日期格式化与解析装饰器
+ *
+ * 自动注册序列化与反序列化钩子，支持：
+ * - `JsonFormat('yyyy-MM-dd')` 日期字符串格式化
+ * - `JsonFormat(Number)` 时间戳模式
+ * - `JsonFormat({ pattern, timezone })` 带时区的日期格式化
+ *
+ * @param pattern - 日期格式字符串、`Number` 构造函数或选项对象
+ * @param timezone - 可选，时区偏移小时数
+ * @returns 属性装饰器
+ */
 export function JsonFormat<This extends object = any>(shape: NumberConstructor): AutoPropertyDecorator<This, Date>;
 export function JsonFormat<This extends object = any>(pattern: string, timezone?: number): AutoPropertyDecorator<This, Date>;
 export function JsonFormat<This extends object = any>(options: { pattern: string; timezone?: number; }): AutoPropertyDecorator<This, Date>;

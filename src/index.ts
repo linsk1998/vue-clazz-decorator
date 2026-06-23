@@ -1,3 +1,15 @@
+/**
+ * vue-clazz-decorator 主入口模块
+ *
+ * 提供基于装饰器的 Vue 类组件开发方案，包括：
+ * - 组件装饰器（@Component、@ViewModel）
+ * - 属性装饰器（@Prop、@State、@Ref、@Inject、@Provide、@ModelValue）
+ * - 方法装饰器（@Watch、@Emit、生命周期钩子）
+ * - 数据模型装饰器（@Model、@Type、@Json...）
+ * - 元数据反射 API
+ *
+ * @module vue-clazz-decorator
+ */
 export { nextTick } from "vue";
 export * from "./decorator/types";
 export * from "./metadata/defineClassMetadata";

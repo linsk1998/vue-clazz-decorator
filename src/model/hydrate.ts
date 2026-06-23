@@ -7,6 +7,18 @@ import { array, REACTIVE, ReactiveArray, TYPE } from "./array";
 import { applyOnionDeserialize } from "./deserialize";
 import { createComputedAccessor, createStateAccessor } from "./reactive";
 
+/**
+ * 水合函数：将普通对象转换为 Model 类实例
+ *
+ * 根据类上注册的元数据配置（`@Type`、`@State`、`@Computed` 等），
+ * 将原始对象转换为类型化的类实例，并对嵌套类型递归水合。
+ * 支持数组、基础类型（Number/String/Boolean）和自定义 Model 类的自动转换
+ *
+ * @typeParam T - 目标类型
+ * @param o - 原始数据对象或数组
+ * @param Class - 目标类的构造函数
+ * @returns 水合后的实例
+ */
 function hydrate<T>(o: T[], Class: ArrayConstructor): T[];
 function hydrate<T>(o: any, Class: { new(): T; }): T;
 function hydrate(o: any, Class: any): any {

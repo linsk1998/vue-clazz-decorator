@@ -9,6 +9,14 @@ import { applyOnionDeserialize } from "./deserialize";
 
 export type InstantiateFunction = (value: any, type: any) => any;
 
+/**
+ * 将普通对象转换为响应式 Model 类实例
+ *
+ * @typeParam T - 目标类型
+ * @param o - 原始数据对象或数组
+ * @param Class - 目标类的构造函数
+ * @returns 响应式水合后的实例
+ */
 function reactive<T>(o: T[], Class: ArrayConstructor): T[];
 function reactive<T>(o: any, Class: { new(): T; }): T;
 function reactive(o: any, Class: any): any {
@@ -131,6 +139,14 @@ function reactive(o: any, Class: any): any {
 export { reactive };
 
 
+/**
+ * 创建状态访问器（基础类型或无类型）
+ *
+ * @param initValue - 初始值
+ * @param Class - 可选，目标类型
+ * @param instantiate - 可选，值水合函数
+ * @returns 包含 get/set 方法的访问器
+ */
 export function createStateAccessor(initValue: any, Class?: any, instantiate?: InstantiateFunction) {
 	var refContainer: ShallowRef;
 	if(Class) {
@@ -155,6 +171,17 @@ export function createStateAccessor(initValue: any, Class?: any, instantiate?: I
 	};
 }
 
+/**
+ * 创建计算属性访问器
+ *
+ * 使用 Vue `computed()` 包装 getter/setter，返回访问器对象。
+ * getter 和 setter 通过 `call` 绑定到实例上执行
+ *
+ * @param inst - 目标实例
+ * @param key - 属性名
+ * @param descriptor - 包含 get/set 的属性描述符
+ * @returns 包含 get/set 方法的访问器
+ */
 export function createComputedAccessor(inst: any, key: string, { get, set }: PropertyDescriptor) {
 	const c = computed({
 		get: () => get.call(inst),

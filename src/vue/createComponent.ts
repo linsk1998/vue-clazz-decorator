@@ -5,11 +5,28 @@ import { use } from "./use";
 
 type Template<T> = (props: T) => JSX.Element;
 type ViewModel<T> = { new(): T; };
+
+/**
+ * Vue JSX 组件类型
+ *
+ * @typeParam T - 组件的 props 类型
+ */
 export type VueJsxComponent<T> = {
 	new(): { $props: Partial<T>; };
 };
 
-/** 创建组件 */
+/**
+ * 创建组件
+ *
+ * 将模板（JSX 渲染函数或 Vue 组件）与 ViewModel 类绑定为完整的 Vue 组件。
+ * 仅传模板时返回原模板，传入 ViewModel 时生成带 setup/render 的组件选项。
+ * 组件中的 `@Ref` 装饰器字段会自动创建 `shallowRef`
+ *
+ * @typeParam T - 组件 props 类型
+ * @param template - JSX 渲染函数或 Vue 组件对象
+ * @param Class - 可选，ViewModel 类
+ * @returns Vue 组件
+ */
 function createComponent<T>(template: VueJsxComponent<T>): VueJsxComponent<T>;
 function createComponent<T>(template: VueJsxComponent<T>, Class: ViewModel<T>): VueJsxComponent<T>;
 function createComponent<T>(template: Template<T>): Template<T>;
